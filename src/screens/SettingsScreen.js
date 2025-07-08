@@ -18,7 +18,7 @@ const SettingsScreen = () => {
   };
 
   const handleOpenPrivacyLink = () => {
-    Linking.openURL('https://your-privacy-policy-url.com'); // замените на свою ссылку
+    Linking.openURL('https://www.termsfeed.com/live/725b769b-80c4-4d16-9dd7-3908bd5970c3'); // замените на свою ссылку
   };
 
   return (
@@ -37,7 +37,7 @@ const SettingsScreen = () => {
         <Text style={styles.cardText}>Privacy & Security</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={handleOpenPrivacyLink}>
         <Text style={styles.cardText}>Terms of use</Text>
       </TouchableOpacity>
     </ImageBackground>
