@@ -61,8 +61,6 @@
 		<string>twitter</string>
 	</array>
 	<key>UIAppFonts</key>
-	<array>
-		<string>BitcountGridDouble-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf</string>
-	</array>
+	<array/>
 </dict>
 </plist>
