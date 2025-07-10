@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
         fontSize: 40,
         color: 'white',
         fontWeight: '900',
-        fontFamily: 'BitcountGridDouble',
+
         textAlign: 'center',
         lineHeight: 48,
         marginBottom: 100,
@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
         bottom: 60,
     },
     buttonText: {
-        fontFamily: 'BitcountGridDouble',
 
         color: '#000',
         fontWeight: 'bold',
