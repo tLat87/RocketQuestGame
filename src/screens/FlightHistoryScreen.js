@@ -51,23 +51,37 @@ const flights = [
 
 const FlightHistoryScreen = ({navigation}) => {
   return (
-
-      <ImageBackground
-        source={require('../assets/img/BG.png')}
-        style={styles.container}
-        resizeMode="cover"
-      >
-      <Text style={styles.header}>Flight History</Text>
+    <ImageBackground
+      source={require('../assets/img/BG.png')} // Your background image
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <Text style={styles.headerTitle}>MISSION ARCHIVES</Text> {/* New thematic header */}
       <FlatList
         data={flights}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={()=>{navigation.navigate('HistoryInfoScreen', {item})}} style={styles.card}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Image source={item.image} style={styles.image} />
+          <TouchableOpacity onPress={()=>{navigation.navigate('HistoryInfoScreen', {item})}} style={styles.missionCard}>
+            <View style={styles.cardTextContent}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              {/* Optional: Add a brief info line */}
+              {item.info && item.info.length > 0 && (
+                <Text style={styles.cardSubtitle}>{item.info[0].split('–')[0].trim()}</Text>
+              )}
+            </View>
+            <Image source={item.image} style={styles.cardImage} />
+            <View style={styles.arrowContainer}>
+              <Text style={styles.cardArrow}>{'〉'}</Text>
+            </View>
           </TouchableOpacity>
         )}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={styles.flatListContent}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyListContainer}>
+            <Text style={styles.emptyListText}>No historical records found.</Text>
+            <Text style={styles.emptyListSubText}>New missions will appear here after completion.</Text>
+          </View>
+        )}
       />
     </ImageBackground>
   );
@@ -78,35 +92,97 @@ export default FlightHistoryScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Чёрный фон
+    backgroundColor: '#050505', // Consistent very dark background
     padding: 20,
+    paddingTop: 60, // Adjusted padding top for consistency
   },
-  header: {
-    fontSize: 28,
+  headerTitle: {
+    fontSize: 34,
     fontWeight: 'bold',
-    color: '#FFFF99', // Бледно-жёлтый заголовок
+    color: '#FFD700', // Gold color, signifying importance/history
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+    textShadowColor: 'rgba(255, 215, 0, 0.7)', // Gold glow
+    textShadowOffset: {width: 0, height: 0},
+    textShadowRadius: 12,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
-  card: {
-    backgroundColor: '#FFD93D', // Жёлтый цвет
-    borderRadius: 30,
-    padding: 20,
-    marginBottom: 20,
+  flatListContent: {
+    paddingBottom: 40, // Space at the bottom
+  },
+  missionCard: {
+    backgroundColor: 'rgba(25, 25, 25, 0.7)', // Semi-transparent dark grey for cards
+    borderRadius: 15, // Rounded corners
+    padding: 18,
+    marginBottom: 20, // More space between cards
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 2, // Prominent border
+    borderColor: '#4CAF50', // Green border for historical significance
+    shadowColor: '#4CAF50', // Matching green glow
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-    flexShrink: 1,
+  cardTextContent: {
+    flex: 1, // Allows text to take available space
+    marginRight: 15,
   },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    marginLeft: 15,
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: '800', // Extra bold title
+    color: '#E0E0E0', // Light grey for main text
+    marginBottom: 5,
+    textShadowColor: 'rgba(255,255,255,0.2)', // Subtle white text shadow
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 3,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: '#B0E0E6', // Light blue for subtle info
+    fontWeight: '500',
+    letterSpacing: 0.3,
+  },
+  cardImage: {
+    width: 90, // Larger image for impact
+    height: 90,
+    borderRadius: 10, // Rounded image corners
+    resizeMode: 'cover', // Ensures image fills the space
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)', // Subtle border around image
+  },
+  arrowContainer: {
+    paddingLeft: 15, // Space for the arrow
+  },
+  cardArrow: {
+    fontSize: 26,
+    color: '#FFD700', // Gold arrow, matching title
+    fontWeight: 'bold',
+  },
+  emptyListContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+    padding: 20,
+    backgroundColor: 'rgba(25, 25, 25, 0.7)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  emptyListText: {
+    color: '#FFA726', // Orange for emphasis
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  emptyListSubText: {
+    color: '#E0E0E0',
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

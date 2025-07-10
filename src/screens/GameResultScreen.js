@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#74D3FF',
     paddingHorizontal: 40,
     paddingVertical: 14,
-    borderRadius: 30,
+    borderRadius: 0,
     marginBottom: 12,
   },
   tryAgainText: {
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FD8A3A',
     paddingHorizontal: 40,
     paddingVertical: 14,
-    borderRadius: 30,
+    borderRadius: 0,
   },
   leaveText: {
     fontSize: 18,

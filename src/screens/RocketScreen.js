@@ -4,14 +4,12 @@ import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react
 const RocketScreen = ({navigation}) => {
   return (
     <ImageBackground
-      source={require('../assets/img/857839cf268323b1cb0db6f8e3db3a41e4a0ce40.png')} // путь к твоему изображению
+      source={require('../assets/img/857839cf268323b1cb0db6f8e3db3a41e4a0ce40.png')}
       style={styles.background}
       resizeMode="cover"
     >
-      {/* Таймер */}
       <Text style={styles.timer}>Dodge and take off</Text>
 
-      {/* Кнопка Start */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('GameScreen')}>
           <Text style={styles.startButtonText}>Start</Text>
@@ -24,6 +22,7 @@ const RocketScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    paddingTop: 50,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#7ED6FC',
     paddingVertical: 15,
     paddingHorizontal: 80,
-    borderRadius: 30,
+    borderRadius: 0,
   },
   startButtonText: {
     color: '#000',

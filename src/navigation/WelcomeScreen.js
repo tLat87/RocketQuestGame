@@ -3,14 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Dimensions }
 
 const WelcomeScreen = ({ navigation }) => {
     const handleStart = () => {
-        navigation.navigate('MainTab'); // Замените на ваш экран
+        navigation.navigate('MainTab');
     };
 
     return (
       <View style={styles.container}>
-          {/* Фоновый слой с ракетами */}
           <ImageBackground
-            source={require('../assets/img/BG.png')} // Создай прозрачный PNG с повторяющимися ракетами
+            source={require('../assets/img/BG.png')}
             style={styles.background}
             resizeMode="repeat"
           >
@@ -40,7 +39,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 40,
         color: 'white',
-        fontWeight: 'bold',
+        fontWeight: '900',
+        fontFamily: 'BitcountGridDouble',
         textAlign: 'center',
         lineHeight: 48,
         marginBottom: 100,
@@ -49,12 +49,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF176',
         paddingVertical: 20,
         width: width - 40,
-        borderRadius: 40,
+        borderRadius: 0,
         alignItems: 'center',
         position: 'absolute',
         bottom: 60,
     },
     buttonText: {
+        fontFamily: 'BitcountGridDouble',
+
         color: '#000',
         fontWeight: 'bold',
         fontSize: 20,

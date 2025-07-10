@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   previewImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 0,
     resizeMode: 'cover',
   },
 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   optionButton: {
     backgroundColor: '#333',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 0,
     marginTop: 6,
   },
   optionText: {
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#222',
     color: '#fff',
-    borderRadius: 12,
+    borderRadius: 0,
     padding: 12,
     marginBottom: 12,
   },
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   imageBox: {
     height: 200,
     backgroundColor: '#999',
-    borderRadius: 20,
+    borderRadius: 0,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   selector: {
     backgroundColor: '#FFD93D',
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -267,14 +267,14 @@ const styles = StyleSheet.create({
   noteInput: {
     backgroundColor: '#B296F7',
     color: '#fff',
-    borderRadius: 20,
+    borderRadius: 0,
     padding: 16,
     minHeight: 80,
   },
   saveButton: {
     backgroundColor: '#FF914D',
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 0,
     marginTop: 30,
     alignItems: 'center',
   },
