@@ -6,6 +6,7 @@ import FlightHistoryScreen from '../screens/FlightHistoryScreen';
 import SpaceMissionCollection from '../screens/SpaceMissionCollectionScreen';
 import RocketScreen from '../screens/RocketScreen'; // Assuming this is your Rocket Encyclopedia screen from previous example
 import SettingsScreen from '../screens/SettingsScreen';
+import SignalAnalyzerScreen from '../screens/SignalAnalyzerScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,6 +16,7 @@ const MainTabNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false, // Ensure headers are hidden as per your options
         tabBarStyle: styles.tabBar,
+
         tabBarShowLabel: false, // Hide default labels to use custom ones
         tabBarIcon: ({ focused }) => {
           let iconSource;
@@ -23,15 +25,15 @@ const MainTabNavigator = () => {
 
           if (route.name === 'Home') {
             iconSource = require('../assets/img/ico/Vectorк23.png'); // Home icon
-            iconName = 'Launch';
+            iconName = '';
             screenName = 'Home';
           } else if (route.name === 'FlightHistoryScreen') {
             iconSource = require('../assets/img/ico/Vector.png'); // History icon
-            iconName = 'Archives';
+            iconName = '';
             screenName = 'FlightHistoryScreen';
           } else if (route.name === 'SpaceMissionCollection') {
             iconSource = require('../assets/img/ico/Group.png'); // Collection icon
-            iconName = 'Collection';
+            iconName = '';
             screenName = 'SpaceMissionCollection';
           } else if (route.name === 'RocketScreen') {
             iconSource = require('../assets/img/ico/Vectorко.png'); // Rockets icon (Encyclopedia)
@@ -52,9 +54,9 @@ const MainTabNavigator = () => {
                   focused && styles.tabIconFocused, // Apply focused style
                 ]}
               />
-              <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
-                {iconName}
-              </Text>
+              {/*<Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>*/}
+              {/*  {iconName}*/}
+              {/*</Text>*/}
             </View>
           );
         },

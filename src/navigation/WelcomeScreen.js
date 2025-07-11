@@ -13,7 +13,7 @@ const WelcomeScreen = ({ navigation }) => {
             style={styles.background}
             resizeMode="repeat"
           >
-              <Text style={styles.title}>ROCKET{'\n'}QUEST{'\n'}GAME</Text>
+              <Text style={styles.title}>ROCKET{'\n'}QUEST</Text>
               <TouchableOpacity style={styles.button} onPress={handleStart}>
                   <Text style={styles.buttonText}>Start</Text>
               </TouchableOpacity>
