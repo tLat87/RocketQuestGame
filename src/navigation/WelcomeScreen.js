@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Dimensions }
 
 const WelcomeScreen = ({ navigation }) => {
     const handleStart = () => {
-        // navigation.navigate('MainTab');
+        navigation.navigate('MainTab');
     };
 
     return (
