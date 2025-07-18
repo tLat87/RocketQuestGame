@@ -15,6 +15,12 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="58dc16f7932fbaaa40188a54085e5b02e45e0eee" translatesAutoresizingMaskIntoConstraints="NO" id="aRk-8q-7G4">
+                                <rect key="frame" x="-110" y="-55" width="594" height="777"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </imageView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
                     </view>
@@ -25,6 +31,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="58dc16f7932fbaaa40188a54085e5b02e45e0eee" width="1024" height="1536"/>
         <systemColor name="viewFlipsideBackgroundColor">
             <color red="0.12156862745098039" green="0.12941176470588237" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

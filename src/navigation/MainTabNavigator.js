@@ -74,10 +74,10 @@ const MainTabNavigator = () => {
         name="SpaceMissionCollection"
         component={SpaceMissionCollection}
       />
-      <Tab.Screen
-        name="RocketScreen"
-        component={RocketScreen}
-      />
+      {/*<Tab.Screen*/}
+      {/*  name="RocketScreen"*/}
+      {/*  component={RocketScreen}*/}
+      {/*/>*/}
       <Tab.Screen
         name="SettingsScreen"
         component={SettingsScreen}
