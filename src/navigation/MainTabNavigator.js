@@ -1,12 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {Image, Text, TouchableOpacity, View, StyleSheet} from 'react-native'; // Import StyleSheet
+import { Image, Text, View, StyleSheet } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import FlightHistoryScreen from '../screens/FlightHistoryScreen';
 import SpaceMissionCollection from '../screens/SpaceMissionCollectionScreen';
-import RocketScreen from '../screens/RocketScreen'; // Assuming this is your Rocket Encyclopedia screen from previous example
+import RocketScreen from '../screens/RocketScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import SignalAnalyzerScreen from '../screens/SignalAnalyzerScreen';
+import SpaceRoadmapScreen from '../screens/GameResultScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,35 +15,24 @@ const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // Ensure headers are hidden as per your options
+        headerShown: false,
         tabBarStyle: styles.tabBar,
-
-        tabBarShowLabel: false, // Hide default labels to use custom ones
+        tabBarShowLabel: false,
         tabBarIcon: ({ focused }) => {
           let iconSource;
-          let iconName;
-          let screenName;
 
           if (route.name === 'Home') {
-            iconSource = require('../assets/img/ico/Vectorк23.png'); // Home icon
-            iconName = '';
-            screenName = 'Home';
+            iconSource = require('../assets/img/ico/Vectorк23.png');
           } else if (route.name === 'FlightHistoryScreen') {
-            iconSource = require('../assets/img/ico/Vector.png'); // History icon
-            iconName = '';
-            screenName = 'FlightHistoryScreen';
+            iconSource = require('../assets/img/ico/Vector.png');
           } else if (route.name === 'SpaceMissionCollection') {
-            iconSource = require('../assets/img/ico/Group.png'); // Collection icon
-            iconName = '';
-            screenName = 'SpaceMissionCollection';
+            iconSource = require('../assets/img/ico/Group.png');
           } else if (route.name === 'RocketScreen') {
-            iconSource = require('../assets/img/ico/Vectorко.png'); // Rockets icon (Encyclopedia)
-            iconName = 'Rockets';
-            screenName = 'RocketScreen';
+            iconSource = require('../assets/img/ico/Vectorко.png');
           } else if (route.name === 'SettingsScreen') {
-            iconSource = require('../assets/img/ico/Page-1.png'); // Settings icon
-            iconName = 'Settings';
-            screenName = 'SettingsScreen';
+            iconSource = require('../assets/img/ico/Page-1.png');
+          }else  if (route.name === 'SpaceRoadmapScreen') {
+            iconSource = require('../assets/img/ico/Vectorко.png');
           }
 
           return (
@@ -51,37 +41,19 @@ const MainTabNavigator = () => {
                 source={iconSource}
                 style={[
                   styles.tabIcon,
-                  focused && styles.tabIconFocused, // Apply focused style
+                  focused && styles.tabIconFocused,
                 ]}
               />
-              {/*<Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>*/}
-              {/*  {iconName}*/}
-              {/*</Text>*/}
             </View>
           );
         },
       })}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-      />
-      <Tab.Screen
-        name="FlightHistoryScreen"
-        component={FlightHistoryScreen}
-      />
-      <Tab.Screen
-        name="SpaceMissionCollection"
-        component={SpaceMissionCollection}
-      />
-      {/*<Tab.Screen*/}
-      {/*  name="RocketScreen"*/}
-      {/*  component={RocketScreen}*/}
-      {/*/>*/}
-      <Tab.Screen
-        name="SettingsScreen"
-        component={SettingsScreen}
-      />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="FlightHistoryScreen" component={FlightHistoryScreen} />
+      <Tab.Screen name="SpaceMissionCollection" component={SpaceMissionCollection} />
+       <Tab.Screen name="SpaceRoadmapScreen" component={SpaceRoadmapScreen} />
+      <Tab.Screen name="SettingsScreen" component={SettingsScreen} />
     </Tab.Navigator>
   );
 };
@@ -89,52 +61,52 @@ const MainTabNavigator = () => {
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
-    bottom: 25, // Slightly higher off the bottom
+    bottom: 25,
     left: 20,
     right: 20,
     width: '90%',
     marginLeft: '5%',
-    height: 80, // Taller tab bar
-    borderRadius: 25, // More rounded corners for a sleek, modern look
-    backgroundColor: 'rgba(15, 15, 15, 0.9)', // Very dark, semi-transparent background
-    borderTopWidth: 2, // A distinct top border
-    borderTopColor: 'rgba(0, 255, 255, 0.5)', // Cyan glowing border
-    shadowColor: '#00FFFF', // Cyan glow shadow
+    height: 80,
+    borderRadius: 25,
+    backgroundColor: 'rgba(15, 15, 15, 0.9)',
+    borderTopWidth: 2,
+    borderTopColor: 'rgba(255, 215, 0, 0.6)', // Золотистая рамка
+    shadowColor: '#FFD700', // Золотистая тень
     shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.7,
+    shadowOpacity: 0.6,
     shadowRadius: 15,
     paddingTop: 10,
-    elevation: 20, // Android shadow
+    elevation: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconContainer: {
-    flex: 1, // Allow each icon to take equal space
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 10, // Adjust padding for icon and label positioning
+    paddingTop: 10,
   },
   tabIcon: {
-    width: 26, // Slightly larger icons
+    width: 26,
     height: 26,
     resizeMode: 'contain',
-    tintColor: '#888', // Default grey for inactive icons
-    marginBottom: 5, // Space between icon and label
+    tintColor: '#888', // Серый по умолчанию
+    marginBottom: 5,
   },
   tabIconFocused: {
-    tintColor: '#00FFFF', // Bright cyan for focused icon
-    transform: [{ scale: 1.1 }], // Slightly scale up focused icon
+    tintColor: '#FFD700', // Ярко-жёлтый при фокусе
+    transform: [{ scale: 1.1 }],
   },
   tabLabel: {
-    color: '#888', // Default grey for inactive labels
+    color: '#888',
     fontSize: 12,
     fontWeight: 'bold',
-    textTransform: 'uppercase', // Uppercase labels
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   tabLabelFocused: {
-    color: '#00FFFF', // Bright cyan for focused label
-    textShadowColor: 'rgba(0, 255, 255, 0.5)', // Subtle glow for focused label
+    color: '#FFD700',
+    textShadowColor: 'rgba(255, 215, 0, 0.5)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 5,
   },

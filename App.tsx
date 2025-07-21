@@ -22,7 +22,7 @@ export default function App() {
             <PersistGate loading={null} persistor={persistor}>
                 <NavigationContainer>
                     <Stack.Navigator>
-                        <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+                        {/*<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />*/}
                         <Stack.Screen name="MainTab" component={MainTabNavigator} options={{ headerShown: false }} />
                         <Stack.Screen name="RocketDetailsScreen" component={RocketDetailsScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="CreateMissionScreen" component={CreateMissionScreen} options={{ headerShown: false }} />
