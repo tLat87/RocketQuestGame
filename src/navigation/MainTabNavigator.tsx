@@ -137,11 +137,11 @@ const MainDrawerNavigator: React.FC = () => {
 
     >
       {/* Drawer Screens */}
-      <Drawer.Screen name="Home" component={HomeScreen} options={{ drawerLabel: 'Home Dashboard' }} />
-      <Drawer.Screen name="FlightHistoryScreen" component={FlightHistoryScreen} options={{ drawerLabel: 'Flight Log' }} />
-      <Drawer.Screen name="SpaceMissionCollection" component={SpaceMissionCollection} options={{ drawerLabel: 'Personal Archive' }} />
-      <Drawer.Screen name="SpaceRoadmapScreen" component={SpaceRoadmapScreen} options={{ drawerLabel: 'Cosmic Roadmap' }} />
-      <Drawer.Screen name="SettingsScreen" component={SettingsScreen} options={{ drawerLabel: 'System Settings' }} />
+      <Drawer.Screen name="Home" component={HomeScreen} options={{ drawerLabel: ' Home Dashboard' }} />
+      <Drawer.Screen name="FlightHistoryScreen" component={FlightHistoryScreen} options={{ drawerLabel: ' Flight Log' }} />
+      <Drawer.Screen name="SpaceMissionCollection" component={SpaceMissionCollection} options={{ drawerLabel: ' Personal Archive' }} />
+      <Drawer.Screen name="SpaceRoadmapScreen" component={SpaceRoadmapScreen} options={{ drawerLabel: ' Cosmic Roadmap' }} />
+      <Drawer.Screen name="SettingsScreen" component={SettingsScreen} options={{ drawerLabel: ' Profile' }} />
       {/* <Drawer.Screen name="RocketScreen" component={RocketScreen} options={{ drawerLabel: 'Rocket Catalog' }} /> */}
     </Drawer.Navigator>
   );
