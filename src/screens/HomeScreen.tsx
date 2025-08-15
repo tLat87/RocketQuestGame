@@ -2,52 +2,48 @@ import React from 'react';
 import {
   View,
   Text,
-  FlatList,
   Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ImageBackground,
-  ListRenderItem, // For FlatList renderItem typing
+  SafeAreaView,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack'; // For navigation typing
+import { StackNavigationProp } from '@react-navigation/stack';
 
 // Define types for your navigation stack
 type RootStackParamList = {
-  RocketDetailsScreen: { rocket: Rocket }; // Ensure this matches your navigation setup
-  // Add other screen names in your stack if needed
+  RocketDetailsScreen: { rocket: Rocket };
 };
-
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RocketDetailsScreen'>;
-
 interface HomeScreenProps {
   navigation: HomeScreenNavigationProp;
 }
 
-// Define the interface for a single Rocket object
+// Define the interface for a single Rocket object (unchanged)
 interface Rocket {
   id: string;
   name: string;
-  type: string; // e.g., 'Orbital', 'Suborbital', 'Heavy-Lift'
+  type: string;
   status: 'Flying Now' | 'Operational' | 'Retired' | 'Testing' | 'Development' | 'Concept';
-  color: string; // Base color for the card/type pill
-  statusColor: string; // Color specifically for the status text
+  color: string;
+  statusColor: string;
   Specifications: string[];
   Missions: string[];
   interestingFacts: string[];
   Country: string;
-  image: any; // Use 'any' for local image require paths
-  block: 'Active Launch Vehicles' | 'Next-Gen & Development' | 'Historic & Legacy'; // New categorization block
+  image: any;
+  block: 'Active Launch Vehicles' | 'Next-Gen & Development' | 'Historic & Legacy';
 }
 
+// Hard-coded rocket data (unchanged)
 const rockets: Rocket[] = [
   {
     id: '1',
     name: 'Falcon 9',
     type: 'Medium-Lift Orbital',
     status: 'Flying Now',
-    color: '#00FFFF', // Cyan for active/modern feel
-    statusColor: '#32CD32', // Lime green for "Flying Now"
+    color: '#00FFFF',
+    statusColor: '#32CD32',
     Specifications: [
       'Height: 70 m (229.6 ft)',
       'Mass: 549 t (1,207,920 lb)',
@@ -67,11 +63,11 @@ const rockets: Rocket[] = [
       'Utilizes Merlin engines, known for their high performance and reusability.',
     ],
     Country: 'USA',
-    image: require('../assets/img/1f04c2d921205548d16091678a7dae5dbda6d78b.png'), // Your image path
+    image: require('../assets/img/1f04c2d921205548d16091678a7dae5dbda6d78b.png'),
     block: 'Active Launch Vehicles',
   },
   {
-    id: '3', // Moved up for logical grouping in 'Active' block
+    id: '3',
     name: 'Soyuz',
     Country: 'Russia (formerly USSR)',
     Specifications: [
@@ -95,11 +91,11 @@ const rockets: Rocket[] = [
     status: 'Flying Now',
     color: '#00FFFF',
     statusColor: '#32CD32',
-    image: require('../assets/img/6e78dff5ba756afd30e38fb1149cc86c77b0672b.png'), // Your image path
+    image: require('../assets/img/6e78dff5ba756afd30e38fb1149cc86c77b0672b.png'),
     block: 'Active Launch Vehicles',
   },
   {
-    id: '7', // Moved up for logical grouping
+    id: '7',
     name: 'Electron',
     type: 'Small-Lift Orbital',
     status: 'Flying Now',
@@ -122,15 +118,15 @@ const rockets: Rocket[] = [
       'Known for its carbon composite structure, making it very lightweight and efficient.',
     ],
     Country: 'New Zealand/USA',
-    image: require('../assets/img/ec1d656927cba57f373a047fbfad47d7a9ed310d.png'), // Your image path
+    image: require('../assets/img/ec1d656927cba57f373a047fbfad47d7a9ed310d.png'),
     block: 'Active Launch Vehicles',
   },
   {
-    id: '8', // Moved up for logical grouping
+    id: '8',
     name: 'New Shepard',
     type: 'Suborbital Tourism',
     status: 'Operational',
-    color: '#00BFFF', // Deep sky blue for specialized/tourism
+    color: '#00BFFF',
     statusColor: '#32CD32',
     Specifications: [
       'Height: 18 m (59 ft) (booster and capsule)',
@@ -148,10 +144,9 @@ const rockets: Rocket[] = [
       'Provides a few minutes of weightlessness and views of Earth from space.',
     ],
     Country: 'USA',
-    image: require('../assets/img/f9abfd12a2980520e6db1676a17dbcbff21eb5b2.png'), // Your image path
+    image: require('../assets/img/f9abfd12a2980520e6db1676a17dbcbff21eb5b2.png'),
     block: 'Active Launch Vehicles',
   },
-  // --- NEXT-GEN & DEVELOPMENT ---
   {
     id: '4',
     Country: 'USA',
@@ -175,13 +170,11 @@ const rockets: Rocket[] = [
     ],
     type: 'Super Heavy-Lift Reusable',
     status: 'Testing',
-    color: '#FF4500', // Orange-red for development/testing
-    statusColor: '#FF6347', // Tomato for testing
-    image: require('../assets/img/9e66016a08e08d706a2df042eddfb53d947bbe5c.png'), // Your image path
+    color: '#FF4500',
+    statusColor: '#FF6347',
+    image: require('../assets/img/9e66016a08e08d706a2df042eddfb53d947bbe5c.png'),
     block: 'Next-Gen & Development',
   },
-  // Add other upcoming/future rockets here
-  // Example for Ariane 6 (current successor to Ariane 5)
   {
     id: '9',
     name: 'Ariane 6',
@@ -204,13 +197,12 @@ const rockets: Rocket[] = [
       'Capable of multiple reignitions of its Vinci upper stage engine, allowing for precise orbit insertions.',
     ],
     type: 'Heavy-Lift Orbital',
-    status: 'Development', // Or 'Testing' closer to first flight
+    status: 'Development',
     color: '#FF4500',
     statusColor: '#FF6347',
-    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'), // Reusing Ariane 5 image for now, replace with Ariane 6 if available
+    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'),
     block: 'Next-Gen & Development',
   },
-  // --- HISTORIC & LEGACY ---
   {
     id: '2',
     name: 'Saturn V',
@@ -233,13 +225,13 @@ const rockets: Rocket[] = [
     ],
     type: 'Super Heavy-Lift Expendable',
     status: 'Retired',
-    color: '#FFD700', // Gold for historic/retired
-    statusColor: '#FFA500', // Orange for retired
-    image: require('../assets/img/2be9fe1af1118c0de429881b4372dfb2a44ae225.png'), // Your image path
+    color: '#FFD700',
+    statusColor: '#FFA500',
+    image: require('../assets/img/2be9fe1af1118c0de429881b4372dfb2a44ae225.png'),
     block: 'Historic & Legacy',
   },
   {
-    id: '5', // Adjusted to fit into Historic block
+    id: '5',
     name: 'Ariane 5',
     Country: 'Europe (ESA)',
     Specifications: [
@@ -263,13 +255,12 @@ const rockets: Rocket[] = [
     status: 'Retired',
     color: '#FFD700',
     statusColor: '#FFA500',
-    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'), // Your image path
+    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'),
     block: 'Historic & Legacy',
   },
-  // Example for an older Delta variant, assuming Delta IV is phased out
   {
-    id: '6', // Assuming this is an older Delta variant, no longer operational
-    name: 'Delta II', // Specific older variant
+    id: '6',
+    name: 'Delta II',
     type: 'Medium-Lift Expendable',
     status: 'Retired',
     color: '#FFD700',
@@ -291,12 +282,12 @@ const rockets: Rocket[] = [
       'Known for its distinctive "nine-pack" solid rocket booster configuration on some variants.',
     ],
     Country: 'USA',
-    image: require('../assets/img/d62f32498eec0213986f2fde276aa0fe2eff5e39.png'), // Your image path
+    image: require('../assets/img/d62f32498eec0213986f2fde276aa0fe2eff5e39.png'),
     block: 'Historic & Legacy',
   },
 ];
 
-// Group rockets by their 'block'
+// Group rockets by their 'block' property
 const getGroupedRockets = (allRockets: Rocket[]) => {
   const grouped: Record<string, Rocket[]> = {};
   allRockets.forEach((rocket) => {
@@ -305,210 +296,149 @@ const getGroupedRockets = (allRockets: Rocket[]) => {
     }
     grouped[rocket.block].push(rocket);
   });
-  return Object.keys(grouped).map((blockName) => ({
-    title: blockName,
-    data: grouped[blockName],
-  }));
+  return grouped;
 };
 
-const sections = getGroupedRockets(rockets);
+const groupedRockets = getGroupedRockets(rockets);
 
-const RocketCard: React.FC<{ item: Rocket; navigation: HomeScreenNavigationProp }> = ({ item, navigation }) => (
+// Component for a single rocket card with the new design
+const RocketCard: React.FC<{
+  item: Rocket;
+  navigation: HomeScreenNavigationProp;
+  accentColor: string;
+}> = ({ item, navigation, accentColor }) => (
   <TouchableOpacity
     onPress={() => navigation.navigate('RocketDetailsScreen', { rocket: item })}
-    style={styles.rocketCard}
+    style={[styles.rocketCard, { borderColor: accentColor }]}
+    activeOpacity={0.8}
   >
-    <View style={styles.textColumn}>
-      <View style={[styles.typePill, { backgroundColor: item.color }]}>
-        <Text style={styles.typeText}>{item.type}</Text>
-      </View>
-      <Text style={styles.rocketName}>{item.name}</Text>
-      {item.status ? (
-        <Text style={[styles.statusIndicator, { color: item.statusColor }]}>
-          STATUS: {item.status.toUpperCase()}
-        </Text>
-      ) : null}
-      {item.Country && (
-        <Text style={styles.rocketCountry}>Country: {item.Country}</Text>
-      )}
-    </View>
     <Image source={item.image} style={styles.rocketImage} />
+    <View style={styles.cardInfo}>
+      <Text style={styles.rocketName}>{item.name}</Text>
+      <Text style={styles.rocketType}>{item.type}</Text>
+      <Text style={[styles.statusIndicator, { color: accentColor }]}>
+        {item.status.toUpperCase()}
+      </Text>
+      <Text style={styles.rocketCountry}>Страна: {item.Country}</Text>
+    </View>
   </TouchableOpacity>
 );
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-  return (
-    <ImageBackground
-      source={require('../assets/img/BG.png')} // your background image
-      style={styles.backgroundContainer}
-      resizeMode="cover"
-    >
-      <Text style={styles.title}>LAUNCHPAD LOG</Text>
+  // Define accent colors for each block
+  const blockColors = {
+    'Active Launch Vehicles': '#00BFFF', // Deep Sky Blue
+    'Next-Gen & Development': '#FF7F50', // Coral
+    'Historic & Legacy': '#D3D3D3', // Light Gray
+  };
 
-      <FlatList
-        data={sections.flatMap(section => [
-          { type: 'header', title: section.title, id: section.title }, // Header marker
-          ...section.data,
-        ])}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          if ((item as any).type === 'header') {
-            return (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>{(item as any).title}</Text>
-                <View style={styles.sectionUnderline} />
-              </View>
-            );
-          }
-          return <RocketCard item={item as Rocket} navigation={navigation} />;
-        }}
-        contentContainerStyle={styles.flatListContent}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyListContainer}>
-            <Text style={styles.emptyListText}>No rocket data found.</Text>
-            <Text style={styles.emptyListSubText}>Exploring new frontiers!</Text>
+  return (
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>LAUNCHPAD LOG</Text>
+
+        {Object.keys(groupedRockets).map((blockName) => (
+          <View key={blockName} style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{blockName}</Text>
+            <View style={styles.cardListContainer}>
+              {groupedRockets[blockName].map((rocket) => (
+                <RocketCard
+                  key={rocket.id}
+                  item={rocket}
+                  navigation={navigation}
+                  accentColor={blockColors[blockName as keyof typeof blockColors]}
+                />
+              ))}
+            </View>
           </View>
-        )}
-      />
-    </ImageBackground>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundContainer: {
+  safeAreaContainer: {
     flex: 1,
-    backgroundColor: '#050505',
-    paddingTop: 60,
+    backgroundColor: '#0A0E1A', // Dark navy background
   },
-  flatListContent: {
+  container: {
+    paddingTop: 20,
     paddingHorizontal: 20,
-    paddingBottom: 40, // More space at the bottom
   },
   title: {
-    color: '#90EE90',
-    fontSize: 36, // Larger title
-    fontWeight: 'bold',
-    marginBottom: 25, // Less margin to bring content up
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
     textAlign: 'center',
-    textShadowColor: 'rgba(144, 238, 144, 0.8)', // Stronger green glow
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 15, // Wider glow
-    letterSpacing: 2.5, // More letter spacing
-    textTransform: 'uppercase',
+    marginBottom: 30,
+    letterSpacing: 1.5,
   },
-  sectionHeader: {
-    marginBottom: 15,
-    marginTop: 25, // More space above new section
-    alignItems: 'flex-start',
+  sectionContainer: {
+    marginBottom: 25,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#E0FFFF', // Cyan/Aqua for section titles
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    textShadowColor: 'rgba(0, 255, 255, 0.4)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 5,
+    color: '#D3D3D3', // Light gray title
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C3A5A',
+    paddingBottom: 5,
   },
-  sectionUnderline: {
-    height: 2,
-    width: '100%', // Full width underline
-    backgroundColor: 'rgba(0, 255, 255, 0.3)', // Faded cyan underline
-    borderRadius: 1,
+  cardListContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
   },
   rocketCard: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(20, 20, 20, 0.85)', // Slightly less transparent for better readability
-    borderRadius: 18, // More rounded corners
-    padding: 20, // More padding
-    marginBottom: 18, // Consistent space between cards
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 2,
-    borderColor: '#00FFFF', // Cyan border
-    shadowColor: '#00FFFF',
-    shadowOffset: { width: 0, height: 8 }, // More pronounced shadow
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  textColumn: {
-    flex: 1,
-    justifyContent: 'flex-start', // Align content to the top
-    marginRight: 15,
-  },
-  typePill: {
-    borderRadius: 25, // More rounded, larger pill
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-    // Color handled by `rocket.color`
-    shadowColor: 'rgba(0,0,0,0.4)',
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.6,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  typeText: {
-    fontWeight: 'bold',
-    fontSize: 15, // Slightly larger
-    color: '#050505',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  rocketName: {
-    fontSize: 30, // Even larger name
-    fontWeight: '900',
-    color: '#E0E0E0',
-    marginBottom: 8,
-    textShadowColor: 'rgba(255,255,255,0.3)', // Stronger text shadow
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 4,
-  },
-  statusIndicator: {
-    fontSize: 16, // Larger status text
-    marginTop: 5,
-    fontWeight: '800', // Even bolder status
-    letterSpacing: 0.8,
-  },
-  rocketCountry: {
-    fontSize: 14,
-    color: '#A9A9A9', // Darker grey for country
-    marginTop: 5,
-    fontStyle: 'italic',
+    width: '48%', // Approx. two cards per row
+    backgroundColor: '#1E2433', // Darker blue for cards
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 8,
   },
   rocketImage: {
-    width: 140, // Wider image
-    height: 200, // Taller image
-    resizeMode: 'contain',
-    borderRadius: 12, // More rounded image corners
-    borderWidth: 1.5, // Slightly thicker border
-    borderColor: 'rgba(255,255,255,0.15)', // Slightly more visible border
-  },
-  emptyListContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 50,
-    padding: 20,
-    backgroundColor: 'rgba(25, 25, 25, 0.7)',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  emptyListText: {
-    color: '#FFA726',
-    fontSize: 20,
-    fontWeight: 'bold',
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+    borderRadius: 8,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  cardInfo: {
+    alignItems: 'center',
+  },
+  rocketName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
-  emptyListSubText: {
-    color: '#E0E0E0',
-    fontSize: 15,
+  rocketType: {
+    fontSize: 14,
+    color: '#A9A9A9',
+    marginTop: 4,
     textAlign: 'center',
-    lineHeight: 22,
+  },
+  statusIndicator: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 8,
+    letterSpacing: 0.5,
+  },
+  rocketCountry: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });
