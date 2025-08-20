@@ -6,13 +6,13 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from './src/redux/store';
 import MainTabNavigator from './src/navigation/MainTabNavigator.tsx';
-import RocketDetailsScreen from './src/screens/RocketInfoScreen.tsx';
-import CreateMissionScreen from './src/screens/CreateMissionScreen.tsx';
-import GameScreen from './src/screens/GameScreen.tsx';
-import GameResultScreen from './src/screens/GameResultScreen.tsx';
-import HistoryInfoScreen from './src/screens/HistoryInfoScreen.tsx';
-import MySpaceInfoScreen from './src/screens/MySpaceInfoScreen.tsx';
-import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Импортируем
+import PlanetDetailsScreen from './src/screens/RocketInfoScreen.tsx';
+import TradeScreen from './src/screens/CreateMissionScreen.tsx';
+import SpaceTravelScreen from './src/screens/GameScreen.tsx';
+import TradeResultScreen from './src/screens/GameResultScreen.tsx';
+import CargoDetailsScreen from './src/screens/HistoryInfoScreen.tsx';
+import ShipManagementScreen from './src/screens/MySpaceInfoScreen.tsx';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createStackNavigator();
 
@@ -26,12 +26,12 @@ export default function App() {
                       <Stack.Navigator>
                           {/*<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />*/}
                           <Stack.Screen name="MainTab" component={MainTabNavigator} options={{ headerShown: false }} />
-                          <Stack.Screen name="RocketDetailsScreen" component={RocketDetailsScreen} options={{ headerShown: false }} />
-                          <Stack.Screen name="CreateMissionScreen" component={CreateMissionScreen} options={{ headerShown: false }} />
-                          <Stack.Screen name="GameScreen" component={GameScreen} options={{ headerShown: false }} />
-                          <Stack.Screen name="GameResultScreen" component={GameResultScreen} options={{ headerShown: false }} />
-                          <Stack.Screen name="HistoryInfoScreen" component={HistoryInfoScreen} options={{ headerShown: false }} />
-                          <Stack.Screen name="MySpaceInfoScreen" component={MySpaceInfoScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="PlanetDetailsScreen" component={PlanetDetailsScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="TradeScreen" component={TradeScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="SpaceTravelScreen" component={SpaceTravelScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="TradeResultScreen" component={TradeResultScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="CargoDetailsScreen" component={CargoDetailsScreen} options={{ headerShown: false }} />
+                          <Stack.Screen name="ShipManagementScreen" component={ShipManagementScreen} options={{ headerShown: false }} />
                       </Stack.Navigator>
                   </NavigationContainer>
               </GestureHandlerRootView>

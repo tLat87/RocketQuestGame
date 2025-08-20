@@ -1,310 +1,473 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  Switch,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
-// Define your RootStackParamList if you haven't already
-type RootStackParamList = {
-  SpaceRoadmap: undefined;
-  AstronautProfile: undefined;
-};
-
-type AstronautProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AstronautProfile'>;
-
-interface AstronautProfileData {
+interface CaptainStats {
   name: string;
-  description: string;
-  advice: string;
-  emoji: string;
-  height: string;
-  weight: string;
-  birthYear: string;
+  rank: string;
+  experience: number;
+  reputation: number;
+  totalTrades: number;
+  totalProfit: number;
+  successfulMissions: number;
+  failedMissions: number;
+  favoritePlanet: string;
+  tradingStyle: string;
+  achievements: string[];
 }
 
-const AstronautProfileScreen: React.FC = () => {
-  const [profileData, setProfileData] = useState<AstronautProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<AstronautProfileScreenNavigationProp>();
+// Mock captain data
+const mockCaptainStats: CaptainStats = {
+  name: 'Captain Alexander Nova',
+  rank: 'Master Trader',
+  experience: 85,
+  reputation: 92,
+  totalTrades: 156,
+  totalProfit: 125000,
+  successfulMissions: 142,
+  failedMissions: 14,
+  favoritePlanet: 'Nova Prime',
+  tradingStyle: 'Aggressive',
+  achievements: [
+    'First Million Credits',
+    'Planetary Explorer',
+    'Risk Taker',
+    'Diplomatic Trader',
+    'Cargo Master',
+    'Speed Trader',
+    'Luxury Specialist',
+    'Technology Broker'
+  ]
+};
 
-  const loadProfile = useCallback(async () => {
-    setLoading(true);
-    try {
-      const storedData = await AsyncStorage.getItem('astronautProfile');
-      if (storedData) {
-        setProfileData(JSON.parse(storedData));
-      } else {
-        setProfileData(null); // No profile found
-      }
-    } catch (e) {
-      console.error('Failed to load astronaut profile:', e);
-      Alert.alert('Error', 'Failed to load your astronaut profile.');
-      setProfileData(null);
-    } finally {
-      setLoading(false);
+export default function CaptainProfileScreen() {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+
+  const getRankColor = (rank: string) => {
+    switch (rank) {
+      case 'Master Trader': return '#FFD700';
+      case 'Expert Trader': return '#C0C0C0';
+      case 'Advanced Trader': return '#CD7F32';
+      case 'Intermediate Trader': return '#32CD32';
+      case 'Novice Trader': return '#87CEEB';
+      default: return '#FFFFFF';
     }
-  }, []);
-
-  // Load profile data when the screen focuses
-  useFocusEffect(
-    useCallback(() => {
-      loadProfile();
-    }, [loadProfile])
-  );
-
-  const navigateToProfileInput = () => {
-    navigation.navigate('SpaceRoadmapScreen'); // Navigate back to SpaceRoadmap to fill out
   };
 
-  if (loading) {
-    return (
-      <ImageBackground
-        source={require('../assets/img/game/dc196ae0e4a161b3ad4b074d993cc5809d267690.png')}
-        style={styles.container}
-        resizeMode="cover"
-      >
-        <ActivityIndicator size="large" color="#E0FFFF" />
-        <Text style={styles.loadingText}>Loading profile...</Text>
-      </ImageBackground>
-    );
-  }
+  const getReputationColor = (reputation: number) => {
+    if (reputation >= 90) return '#4ECDC4';
+    if (reputation >= 70) return '#32CD32';
+    if (reputation >= 50) return '#FFD700';
+    if (reputation >= 30) return '#FFA500';
+    return '#FF6B6B';
+  };
+
+  const getReputationLevel = (reputation: number) => {
+    if (reputation >= 90) return 'Legendary';
+    if (reputation >= 80) return 'Excellent';
+    if (reputation >= 70) return 'Good';
+    if (reputation >= 50) return 'Average';
+    if (reputation >= 30) return 'Poor';
+    return 'Terrible';
+  };
+
+  const getTradingStyleColor = (style: string) => {
+    switch (style) {
+      case 'Aggressive': return '#FF6B6B';
+      case 'Conservative': return '#4ECDC4';
+      case 'Balanced': return '#FFD700';
+      case 'Opportunistic': return '#8A2BE2';
+      default: return '#B0C4DE';
+    }
+  };
 
   return (
-    <ImageBackground
-      source={require('../assets/img/game/dc196ae0e4a161b3ad4b074d993cc5809d267690.png')}
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <Text style={styles.headerTitle}>MY ASTRONAUT PROFILE</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.title}>CAPTAIN PROFILE</Text>
 
-      {profileData ? (
-        <View style={styles.profileCard}>
-          <View style={styles.profileHeader}>
-            {/* Replace with a user profile image if you have one */}
-            <View style={styles.profileImagePlaceholder}>
-              <Text style={styles.profileImageText}>{profileData.emoji}</Text>
+        {/* Captain Header */}
+        <LinearGradient
+          colors={['#1E2433', '#2C3A5A']}
+          style={styles.captainHeader}
+        >
+          <View style={styles.captainInfo}>
+            <Text style={styles.captainName}>{mockCaptainStats.name}</Text>
+            <Text style={[styles.captainRank, { color: getRankColor(mockCaptainStats.rank) }]}>
+              {mockCaptainStats.rank}
+            </Text>
+          </View>
+          
+          <View style={styles.captainStats}>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Experience</Text>
+              <Text style={styles.statValue}>{mockCaptainStats.experience}%</Text>
             </View>
-            <View style={styles.profileHeaderText}>
-              <Text style={styles.profileName}>{profileData.name}</Text>
-              <Text style={styles.profileStatus}>Cosmic Explorer</Text>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Reputation</Text>
+              <Text style={[styles.statValue, { color: getReputationColor(mockCaptainStats.reputation) }]}>
+                {mockCaptainStats.reputation}
+              </Text>
             </View>
           </View>
+        </LinearGradient>
 
-          <View style={styles.profileStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{profileData.height} cm</Text>
-              <Text style={styles.statLabel}>Height</Text>
+        {/* Trading Performance */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>TRADING PERFORMANCE</Text>
+          
+          <View style={styles.performanceGrid}>
+            <View style={styles.performanceItem}>
+              <Text style={styles.performanceLabel}>Total Trades</Text>
+              <Text style={styles.performanceValue}>{mockCaptainStats.totalTrades}</Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{profileData.weight} kg</Text>
-              <Text style={styles.statLabel}>Weight</Text>
+            <View style={styles.performanceItem}>
+              <Text style={styles.performanceLabel}>Total Profit</Text>
+              <Text style={styles.performanceValue}>{mockCaptainStats.totalProfit.toLocaleString()}</Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{profileData.birthYear}</Text>
-              <Text style={styles.statLabel}>Born</Text>
+            <View style={styles.performanceItem}>
+              <Text style={styles.performanceLabel}>Success Rate</Text>
+              <Text style={styles.performanceValue}>
+                {Math.round((mockCaptainStats.successfulMissions / (mockCaptainStats.successfulMissions + mockCaptainStats.failedMissions)) * 100)}%
+              </Text>
+            </View>
+            <View style={styles.performanceItem}>
+              <Text style={styles.performanceLabel}>Favorite Planet</Text>
+              <Text style={styles.performanceValue}>{mockCaptainStats.favoritePlanet}</Text>
             </View>
           </View>
-
-          <Text style={styles.profileBio}>{profileData.description}</Text>
-          <Text style={styles.profileAdvice}>
-            <Text style={{ fontWeight: 'bold' }}>Astronaut's Tip:</Text> {profileData.advice}
-          </Text>
-
-          <TouchableOpacity style={styles.editProfileButton} onPress={navigateToProfileInput}>
-            <Text style={styles.editProfileButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.noProfileContainer}>
-          <Text style={styles.noProfileText}>You haven't determined your astronaut profile yet!</Text>
-          <Text style={styles.noProfileSubText}>
-            Fill in your details on the Cosmic Roadmap screen to see your cosmic identity.
-          </Text>
-          <TouchableOpacity style={styles.fillProfileButton} onPress={navigateToProfileInput}>
-            <Text style={styles.fillProfileButtonText}>Go to Profile Input</Text>
-          </TouchableOpacity>
+
+        {/* Reputation Details */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>REPUTATION ANALYSIS</Text>
+          
+          <View style={styles.reputationContainer}>
+            <View style={styles.reputationHeader}>
+              <Text style={styles.reputationLevel}>
+                {getReputationLevel(mockCaptainStats.reputation)}
+              </Text>
+              <Text style={[styles.reputationScore, { color: getReputationColor(mockCaptainStats.reputation) }]}>
+                {mockCaptainStats.reputation}/100
+              </Text>
+            </View>
+            
+            <View style={styles.reputationBar}>
+              <View 
+                style={[
+                  styles.reputationFill, 
+                  { 
+                    width: `${mockCaptainStats.reputation}%`,
+                    backgroundColor: getReputationColor(mockCaptainStats.reputation)
+                  }
+                ]} 
+              />
+            </View>
+            
+            <Text style={styles.reputationDescription}>
+              Your reputation determines trading prices, access to restricted areas, and the trust of planetary authorities.
+            </Text>
+          </View>
         </View>
-      )}
-    </ImageBackground>
+
+        {/* Trading Style */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>TRADING STYLE</Text>
+          
+          <View style={styles.tradingStyleContainer}>
+            <Text style={[styles.tradingStyleLabel, { color: getTradingStyleColor(mockCaptainStats.tradingStyle) }]}>
+              {mockCaptainStats.tradingStyle.toUpperCase()}
+            </Text>
+            <Text style={styles.tradingStyleDescription}>
+              {mockCaptainStats.tradingStyle === 'Aggressive' 
+                ? 'You prefer high-risk, high-reward trades and are willing to take chances for maximum profit.'
+                : mockCaptainStats.tradingStyle === 'Conservative'
+                ? 'You prioritize safety and stability, preferring reliable but lower-profit trading opportunities.'
+                : mockCaptainStats.tradingStyle === 'Balanced'
+                ? 'You maintain a middle ground between risk and reward, adapting your strategy to market conditions.'
+                : 'You seize opportunities as they arise, adapting your trading approach to maximize each situation.'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Achievements */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>ACHIEVEMENTS</Text>
+          
+          <View style={styles.achievementsContainer}>
+            {mockCaptainStats.achievements.map((achievement, index) => (
+              <View key={index} style={styles.achievementItem}>
+                <Text style={styles.achievementIcon}>🏆</Text>
+                <Text style={styles.achievementText}>{achievement}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Settings */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>SETTINGS</Text>
+          
+          <View style={styles.settingsContainer}>
+            
+            
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Auto Save</Text>
+              <Switch
+                value={autoSaveEnabled}
+                onValueChange={setAutoSaveEnabled}
+                trackColor={{ false: '#2C3A5A', true: '#FFD700' }}
+                thumbColor={autoSaveEnabled ? '#000000' : '#B0C4DE'}
+              />
+            </View>
+            
+            
+          </View>
+        </View>
+
+        {/* Action Buttons */}
+        
+      </ScrollView>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050505',
+    backgroundColor: '#0A0E1A',
+  },
+  scrollView: {
+    flex: 1,
     padding: 20,
-    paddingTop: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  loadingText: {
-    color: '#E0FFFF',
-    marginTop: 15,
-    fontSize: 18,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#E0FFFF',
-    textAlign: 'center',
-    marginBottom: 25,
-    textShadowColor: 'rgba(0, 255, 255, 0.6)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-    letterSpacing: 2.5,
-    textTransform: 'uppercase',
-  },
-  profileCard: {
-    backgroundColor: 'rgba(20, 20, 40, 0.95)',
-    borderRadius: 20,
-    padding: 25,
-    width: '100%',
-    maxWidth: 400,
-    borderWidth: 2,
-    borderColor: '#6A5ACD',
-    shadowColor: '#6A5ACD',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 10,
-    alignItems: 'center',
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    width: '100%',
-    justifyContent: 'center', // Center content
-  },
-  profileImagePlaceholder: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: 'rgba(0, 191, 255, 0.2)',
-    borderWidth: 2,
-    borderColor: '#00BFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  profileImageText: {
-    fontSize: 40,
-  },
-  profileHeaderText: {
-    alignItems: 'flex-start',
-  },
-  profileName: {
+  title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFEA00',
-    textShadowColor: 'rgba(255, 234, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 25,
+    letterSpacing: 1.5,
   },
-  profileStatus: {
-    fontSize: 16,
-    color: '#D0E0FF',
-    marginTop: 5,
+  captainHeader: {
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
   },
-  profileStats: {
+  captainInfo: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  captainName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  captainRank: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  captainStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 25,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    paddingVertical: 15,
   },
   statItem: {
     alignItems: 'center',
   },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#E0FFFF',
-  },
   statLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#B0C4DE',
-    marginTop: 3,
-    textTransform: 'uppercase',
+    marginBottom: 5,
   },
-  profileBio: {
-    fontSize: 16,
-    color: '#E0FFFF',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  profileAdvice: {
-    fontSize: 15,
-    color: '#ADFF2F',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginBottom: 20,
-  },
-  editProfileButton: {
-    backgroundColor: '#00BFFF',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    shadowColor: '#00BFFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  editProfileButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  noProfileContainer: {
-    backgroundColor: 'rgba(25, 25, 25, 0.8)',
-    borderRadius: 15,
-    padding: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '90%',
-    maxWidth: 400,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  noProfileText: {
-    color: '#FFA726',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  noProfileSubText: {
-    color: '#E0E0E0',
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 30,
-  },
-  fillProfileButton: {
-    backgroundColor: '#00FA9A', // Greenish accent
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 12,
-    shadowColor: '#00FA9A',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.7,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  fillProfileButtonText: {
-    color: '#050505', // Dark text for contrast
+  statValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    color: '#FFFFFF',
+  },
+  section: {
+    marginBottom: 25,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 15,
+    letterSpacing: 1,
+  },
+  performanceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  performanceItem: {
+    width: '48%',
+    backgroundColor: '#1E2433',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#2C3A5A',
+    alignItems: 'center',
+  },
+  performanceLabel: {
+    fontSize: 14,
+    color: '#B0C4DE',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  performanceValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  reputationContainer: {
+    backgroundColor: '#1E2433',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#2C3A5A',
+  },
+  reputationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  reputationLevel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  reputationScore: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  reputationBar: {
+    height: 8,
+    backgroundColor: '#2C3A5A',
+    borderRadius: 4,
+    marginBottom: 15,
+    overflow: 'hidden',
+  },
+  reputationFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  reputationDescription: {
+    fontSize: 14,
+    color: '#B0C4DE',
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  tradingStyleContainer: {
+    backgroundColor: '#1E2433',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#2C3A5A',
+  },
+  tradingStyleLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  tradingStyleDescription: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  achievementsContainer: {
+    backgroundColor: '#1E2433',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#2C3A5A',
+  },
+  achievementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C3A5A',
+  },
+  achievementIcon: {
+    fontSize: 20,
+    marginRight: 15,
+  },
+  achievementText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  settingsContainer: {
+    backgroundColor: '#1E2433',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#2C3A5A',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C3A5A',
+  },
+  settingLabel: {
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  actionButtonsContainer: {
+    marginBottom: 40,
+  },
+  editProfileButton: {
+    backgroundColor: '#FFD700',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  editProfileButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+    letterSpacing: 1,
+  },
+  resetProgressButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FF6B6B',
+  },
+  resetProgressButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+    letterSpacing: 1,
   },
 });
-
-export default AstronautProfileScreen;

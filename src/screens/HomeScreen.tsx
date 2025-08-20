@@ -1,444 +1,751 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Animated,
+  Dimensions,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
-// Define types for your navigation stack
-type RootStackParamList = {
-  RocketDetailsScreen: { rocket: Rocket };
-};
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RocketDetailsScreen'>;
-interface HomeScreenProps {
-  navigation: HomeScreenNavigationProp;
-}
 
-// Define the interface for a single Rocket object (unchanged)
-interface Rocket {
+const { width, height } = Dimensions.get('window');
+
+interface Planet {
   id: string;
   name: string;
-  type: string;
-  status: 'Flying Now' | 'Operational' | 'Retired' | 'Testing' | 'Development' | 'Concept';
-  color: string;
-  statusColor: string;
-  Specifications: string[];
-  Missions: string[];
-  interestingFacts: string[];
-  Country: string;
-  image: any;
-  block: 'Active Launch Vehicles' | 'Next-Gen & Development' | 'Historic & Legacy';
+  type: 'Core Systems' | 'Outer Rim' | 'Frontier Worlds' | 'Unknown Regions';
+  status: 'Active' | 'Restricted' | 'Dangerous' | 'Peaceful';
+  resources: string[];
+  tradeGoods: string[];
+  distance: number;
+  population: number;
+  block: string;
 }
 
-// Hard-coded rocket data (unchanged)
-const rockets: Rocket[] = [
+// Mock planets data
+const planets: Planet[] = [
   {
     id: '1',
-    name: 'Falcon 9',
-    type: 'Medium-Lift Orbital',
-    status: 'Flying Now',
-    color: '#00FFFF',
-    statusColor: '#32CD32',
-    Specifications: [
-      'Height: 70 m (229.6 ft)',
-      'Mass: 549 t (1,207,920 lb)',
-      'Payload to LEO: up to 22.8 t (50,265 lb) (expendable)',
-      'Payload to GTO: up to 8.3 t (18,300 lb) (expendable)',
-    ],
-    Missions: [
-      'Crew Dragon missions to the ISS',
-      'Starlink satellite deployments (constellation building)',
-      'NASA, commercial, and military payload deployments',
-      'Transporter rideshare missions',
-    ],
-    interestingFacts: [
-      'The first orbital-class rocket capable of propulsive landing and reflight of its first stage.',
-      'Has achieved over 300 successful launches, making it one of the most reliable and frequently launched rockets.',
-      'Pioneered the rapid reusability concept, significantly reducing launch costs.',
-      'Utilizes Merlin engines, known for their high performance and reusability.',
-    ],
-    Country: 'USA',
-    image: require('../assets/img/1f04c2d921205548d16091678a7dae5dbda6d78b.png'),
-    block: 'Active Launch Vehicles',
-  },
-  {
-    id: '3',
-    name: 'Soyuz',
-    Country: 'Russia (formerly USSR)',
-    Specifications: [
-      'Height: 46.1 m (151.2 ft)',
-      'Mass: 312 t (687,840 lb)',
-      'Payload to LEO: up to 7 t (15,400 lb)',
-      'Legacy variants up to 28 t (61,730 lb) for different orbits',
-    ],
-    Missions: [
-      'Crew and cargo transport to the ISS (Soyuz and Progress spacecraft)',
-      'Satellite deployments (e.g., OneWeb constellation)',
-      'Interplanetary probes (historically)',
-    ],
-    interestingFacts: [
-      'The most frequently launched rocket in history, with over 1,900 launches across all variants.',
-      'Based on the R-7 Semyorka ICBM platform from the 1950s, making it one of the longest-serving rocket families.',
-      'Known for its "Korolyov cross" staging event where the first stage boosters peel away.',
-      'Has flown more human spaceflight missions than any other rocket.',
-    ],
-    type: 'Medium-Lift Orbital',
-    status: 'Flying Now',
-    color: '#00FFFF',
-    statusColor: '#32CD32',
-    image: require('../assets/img/6e78dff5ba756afd30e38fb1149cc86c77b0672b.png'),
-    block: 'Active Launch Vehicles',
-  },
-  {
-    id: '7',
-    name: 'Electron',
-    type: 'Small-Lift Orbital',
-    status: 'Flying Now',
-    color: '#00FFFF',
-    statusColor: '#32CD32',
-    Specifications: [
-      'Height: 18 m (59 ft)',
-      'Mass: 13 t (28,660 lb)',
-      'Payload to LEO: up to 300 kg (660 lb)',
-      'Payload to Sun-Synchronous Orbit: up to 200 kg (440 lb)',
-    ],
-    Missions: [
-      'Dedicated small satellite launches',
-      'Lunar missions (e.g., CAPSTONE for NASA)',
-      'Earth observation and technology demonstration satellites',
-    ],
-    interestingFacts: [
-      'Features 3D-printed Rutherford engines with electric pumps, a unique design in rocketry.',
-      'Rocket Lab, its manufacturer, has successfully caught Electron boosters mid-air with a helicopter for reusability attempts.',
-      'Known for its carbon composite structure, making it very lightweight and efficient.',
-    ],
-    Country: 'New Zealand/USA',
-    image: require('../assets/img/ec1d656927cba57f373a047fbfad47d7a9ed310d.png'),
-    block: 'Active Launch Vehicles',
-  },
-  {
-    id: '8',
-    name: 'New Shepard',
-    type: 'Suborbital Tourism',
-    status: 'Operational',
-    color: '#00BFFF',
-    statusColor: '#32CD32',
-    Specifications: [
-      'Height: 18 m (59 ft) (booster and capsule)',
-      'Apogee: over 100 km (Kármán line)',
-      'Capacity: 6 passengers',
-    ],
-    Missions: [
-      'Suborbital space tourism flights for private individuals',
-      'Scientific research payloads at the edge of space',
-      'Lunar landing technology demonstrations',
-    ],
-    interestingFacts: [
-      'Developed by Blue Origin, founded by Jeff Bezos.',
-      'Designed for fully autonomous flight and vertical landing of both booster and capsule.',
-      'Provides a few minutes of weightlessness and views of Earth from space.',
-    ],
-    Country: 'USA',
-    image: require('../assets/img/f9abfd12a2980520e6db1676a17dbcbff21eb5b2.png'),
-    block: 'Active Launch Vehicles',
-  },
-  {
-    id: '4',
-    Country: 'USA',
-    name: 'Starship',
-    Specifications: [
-      'Height: 120 m (394 ft) (with Super Heavy booster)',
-      'Mass: approximately 5,000 t (11 million lb) (fully fueled)',
-      'Payload to LEO: >100 t (220,000 lb) (fully reusable), up to 250 t (550,000 lb) (expendable)',
-    ],
-    Missions: [
-      'Future Mars colonization missions (planned)',
-      'Artemis program human lunar lander (planned)',
-      'Global deployment of next-generation Starlink satellites',
-      'Point-to-point Earth transportation (concept)',
-    ],
-    interestingFacts: [
-      'The largest and most powerful rocket ever built, surpassing the Saturn V in thrust and payload capacity.',
-      'Designed to be fully and rapidly reusable, including both the booster (Super Heavy) and the Starship upper stage.',
-      'Aims to enable human multi-planetary exploration, starting with Mars.',
-      'Uses Raptor engines, which are full-flow staged combustion cycle engines.',
-    ],
-    type: 'Super Heavy-Lift Reusable',
-    status: 'Testing',
-    color: '#FF4500',
-    statusColor: '#FF6347',
-    image: require('../assets/img/9e66016a08e08d706a2df042eddfb53d947bbe5c.png'),
-    block: 'Next-Gen & Development',
-  },
-  {
-    id: '9',
-    name: 'Ariane 6',
-    Country: 'Europe (ESA)',
-    Specifications: [
-      'Height: 60 m (197 ft)',
-      'Mass: 900 t (1,984,160 lb) (A64 variant)',
-      'Payload to GTO: up to 11.5 t (25,350 lb) (A64 variant)',
-      'Payload to LEO: up to 21.6 t (47,620 lb)',
-    ],
-    Missions: [
-      'Commercial and institutional satellite launches (telecom, Earth observation)',
-      'Deep-space missions (e.g., ESA science missions)',
-      'Serving as Europe\'s primary heavy-lift launcher for decades to come.',
-    ],
-    interestingFacts: [
-      'Successor to Ariane 5, designed to be more cost-effective and flexible.',
-      'Features a modular design with either two (A62) or four (A64) solid rocket boosters.',
-      'Its first flight is highly anticipated as it will secure Europe\'s independent access to space.',
-      'Capable of multiple reignitions of its Vinci upper stage engine, allowing for precise orbit insertions.',
-    ],
-    type: 'Heavy-Lift Orbital',
-    status: 'Development',
-    color: '#FF4500',
-    statusColor: '#FF6347',
-    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'),
-    block: 'Next-Gen & Development',
+    name: 'Nova Prime',
+    type: 'Core Systems',
+    status: 'Active',
+    resources: ['Quantum Crystals', 'Plasma Energy', 'Neural Networks'],
+    tradeGoods: ['Advanced Technology', 'Luxury Items', 'Rare Materials'],
+    distance: 2.3,
+    population: 15000000,
+    block: 'Core Systems',
   },
   {
     id: '2',
-    name: 'Saturn V',
-    Country: 'USA',
-    Specifications: [
-      'Height: 110.6 m (363 ft)',
-      'Mass: 2,970 t (6.5 million lb)',
-      'Payload to LEO: 140 t (310,000 lb)',
-      'Payload to TLI (Trans-Lunar Injection): 48.6 t (107,000 lb)',
-    ],
-    Missions: [
-      'Apollo missions to the Moon (Apollo 8, 10-17)',
-      'Launch of the Skylab space station (converted S-IVB third stage)',
-    ],
-    interestingFacts: [
-      'The most powerful rocket ever successfully flown in terms of total impulse and launch thrust until Starship/Super Heavy.',
-      'Only 13 Saturn V rockets were launched, with zero catastrophic failures during crewed missions.',
-      'Its F-1 engines are still among the most powerful single-chamber liquid-propellant rocket engines ever developed.',
-      'Stood taller than the Statue of Liberty.',
-    ],
-    type: 'Super Heavy-Lift Expendable',
-    status: 'Retired',
-    color: '#FFD700',
-    statusColor: '#FFA500',
-    image: require('../assets/img/2be9fe1af1118c0de429881b4372dfb2a44ae225.png'),
-    block: 'Historic & Legacy',
+    name: 'Quantum Station',
+    type: 'Core Systems',
+    status: 'Active',
+    resources: ['Quantum Processors', 'Energy Cores', 'AI Modules'],
+    tradeGoods: ['Computing Technology', 'Research Data', 'Scientific Equipment'],
+    distance: 1.8,
+    population: 8500000,
+    block: 'Core Systems',
+  },
+  {
+    id: '3',
+    name: 'Crystal World',
+    type: 'Outer Rim',
+    status: 'Peaceful',
+    resources: ['Exotic Crystals', 'Rare Minerals', 'Energy Shards'],
+    tradeGoods: ['Jewelry', 'Decorative Items', 'Energy Sources'],
+    distance: 4.7,
+    population: 3200000,
+    block: 'Outer Rim',
+  },
+  {
+    id: '4',
+    name: 'Tech Hub',
+    type: 'Outer Rim',
+    status: 'Active',
+    resources: ['Advanced Alloys', 'Circuit Components', 'Data Crystals'],
+    tradeGoods: ['Electronic Devices', 'Communication Tech', 'Industrial Equipment'],
+    distance: 3.9,
+    population: 6800000,
+    block: 'Outer Rim',
   },
   {
     id: '5',
-    name: 'Ariane 5',
-    Country: 'Europe (ESA)',
-    Specifications: [
-      'Height: 52 m (170 ft)',
-      'Mass: 780 t (1.7 million lb)',
-      'Payload to GTO: up to 10 t (22,000 lb)',
-      'Payload to LEO: up to 21 t (46,300 lb)',
-    ],
-    Missions: [
-      'Launch of the James Webb Space Telescope (JWST)',
-      'Galileo navigation satellites',
-      'Commercial and institutional satellite deployments',
-      'ATV cargo missions to the ISS',
-    ],
-    interestingFacts: [
-      'Europe\'s workhorse heavy-lift launcher for over 25 years, with more than 110 launches.',
-      'Known for its high reliability, achieving a long streak of successful launches.',
-      'Successfully launched the Rosetta probe to a comet and the BepiColombo mission to Mercury.',
-    ],
-    type: 'Heavy-Lift Orbital',
-    status: 'Retired',
-    color: '#FFD700',
-    statusColor: '#FFA500',
-    image: require('../assets/img/616980d5a69902483b07634c7d56fb8c3659f4b6.png'),
-    block: 'Historic & Legacy',
+    name: 'Resource Center',
+    type: 'Frontier Worlds',
+    status: 'Dangerous',
+    resources: ['Raw Materials', 'Energy Deposits', 'Rare Metals'],
+    tradeGoods: ['Construction Materials', 'Fuel', 'Industrial Supplies'],
+    distance: 6.2,
+    population: 1200000,
+    block: 'Frontier Worlds',
   },
   {
     id: '6',
-    name: 'Delta II',
-    type: 'Medium-Lift Expendable',
-    status: 'Retired',
-    color: '#FFD700',
-    statusColor: '#FFA500',
-    Specifications: [
-      'Height: 39 m (128 ft)',
-      'Mass: 231.8 t (511,000 lb)',
-      'Payload to LEO: up to 6.3 t (13,890 lb)',
-    ],
-    Missions: [
-      'Mars rovers (Spirit & Opportunity)',
-      'GPS satellites',
-      'Deep Impact comet mission',
-      'NASA science missions',
-    ],
-    interestingFacts: [
-      'A highly reliable rocket with 155 successful launches out of 157 attempts.',
-      'Served as NASA\'s workhorse for launching interplanetary missions and Earth-orbiting satellites for decades.',
-      'Known for its distinctive "nine-pack" solid rocket booster configuration on some variants.',
-    ],
-    Country: 'USA',
-    image: require('../assets/img/d62f32498eec0213986f2fde276aa0fe2eff5e39.png'),
-    block: 'Historic & Legacy',
+    name: 'Mystery Zone',
+    type: 'Unknown Regions',
+    status: 'Restricted',
+    resources: ['Unknown Substances', 'Exotic Matter', 'Ancient Artifacts'],
+    tradeGoods: ['Mysterious Items', 'Forbidden Knowledge', 'Rare Collectibles'],
+    distance: 8.9,
+    population: 0,
+    block: 'Unknown Regions',
   },
 ];
 
-// Group rockets by their 'block' property
-const getGroupedRockets = (allRockets: Rocket[]) => {
-  const grouped: Record<string, Rocket[]> = {};
-  allRockets.forEach((rocket) => {
-    if (!grouped[rocket.block]) {
-      grouped[rocket.block] = [];
+export default function HomeScreen({ navigation }: any) {
+  const [selectedBlock, setSelectedBlock] = useState<string>('All');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Entrance animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Continuous pulse animation for title
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const getGroupedPlanets = () => {
+    if (selectedBlock === 'All') {
+      return planets;
     }
-    grouped[rocket.block].push(rocket);
-  });
-  return grouped;
-};
+    return planets.filter(planet => planet.block === selectedBlock);
+  };
 
-const groupedRockets = getGroupedRockets(rockets);
+  const getBlockColors = (block: string) => {
+    switch (block) {
+      case 'Core Systems': return ['#FF6B6B', '#FF8E8E'];
+      case 'Outer Rim': return ['#4ECDC4', '#6EE7E0'];
+      case 'Frontier Worlds': return ['#45B7D1', '#6BC5E3'];
+      case 'Unknown Regions': return ['#96CEB4', '#B8E6B8'];
+      default: return ['#B0C4DE', '#C5D1E8'];
+    }
+  };
 
-// Component for a single rocket card with the new design
-const RocketCard: React.FC<{
-  item: Rocket;
-  navigation: HomeScreenNavigationProp;
-  accentColor: string;
-}> = ({ item, navigation, accentColor }) => (
-  <TouchableOpacity
-    onPress={() => navigation.navigate('RocketDetailsScreen', { rocket: item })}
-    style={[styles.rocketCard, { borderColor: accentColor }]}
-    activeOpacity={0.8}
-  >
-    <Image source={item.image} style={styles.rocketImage} />
-    <View style={styles.cardInfo}>
-      <Text style={styles.rocketName}>{item.name}</Text>
-      <Text style={styles.rocketType}>{item.type}</Text>
-      <Text style={[styles.statusIndicator, { color: accentColor }]}>
-        {item.status.toUpperCase()}
-      </Text>
-      <Text style={styles.rocketCountry}>Страна: {item.Country}</Text>
-    </View>
-  </TouchableOpacity>
-);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return '#4ECDC4';
+      case 'Restricted': return '#FFD700';
+      case 'Dangerous': return '#FF6B6B';
+      case 'Peaceful': return '#96CEB4';
+      default: return '#B0C4DE';
+    }
+  };
 
-export default function HomeScreen({ navigation }: HomeScreenProps) {
-  // Define accent colors for each block
-  const blockColors = {
-    'Active Launch Vehicles': '#00BFFF', // Deep Sky Blue
-    'Next-Gen & Development': '#FF7F50', // Coral
-    'Historic & Legacy': '#D3D3D3', // Light Gray
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'Core Systems': return '#FF6B6B';
+      case 'Outer Rim': return '#4ECDC4';
+      case 'Frontier Worlds': return '#45B7D1';
+      case 'Unknown Regions': return '#96CEB4';
+      default: return '#B0C4DE';
+    }
+  };
+
+  const handlePlanetPress = (planet: Planet) => {
+    navigation.navigate('PlanetDetailsScreen', { planet });
+  };
+
+  const renderPlanetCard = (planet: Planet, index: number) => {
+    const cardAnim = useRef(new Animated.Value(0)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      // Staggered entrance animation
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(cardAnim, {
+            toValue: 1,
+            duration: 600,
+            delay: index * 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(rotateAnim, {
+            toValue: 1,
+            duration: 800,
+            delay: index * 100,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, index * 100);
+    }, []);
+
+    return (
+      <Animated.View
+        key={planet.id}
+        style={[
+          styles.planetCard,
+          {
+            opacity: cardAnim,
+            transform: [
+              { translateY: cardAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [100, 0],
+              })},
+              { scale: cardAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.8, 1],
+              })},
+              { rotateY: rotateAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '360deg'],
+              })},
+            ],
+          },
+        ]}
+      >
+        <View
+          style={styles.planetTouchable}
+          // onPress={() => handlePlanetPress(planet)}
+          // activeOpacity={0.8}
+        >
+          <View style={[styles.planetContainer, { backgroundColor: getBlockColors(planet.block)[0] }]}>
+            <View style={styles.planetHeader}>
+              <Text style={styles.planetName}>{planet.name}</Text>
+              <View style={styles.planetMeta}>
+                <Text style={[styles.planetType, { color: getTypeColor(planet.type) }]}>
+                  {planet.type}
+                </Text>
+                <Text style={[styles.planetStatus, { color: getStatusColor(planet.status) }]}>
+                  {planet.status}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.planetInfo}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Distance:</Text>
+                <Text style={styles.infoValue}>{planet.distance} LY</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Population:</Text>
+                <Text style={styles.infoValue}>{planet.population.toLocaleString()}</Text>
+              </View>
+            </View>
+
+            <View style={styles.resourcesSection}>
+              <Text style={styles.resourcesTitle}>Key Resources:</Text>
+              <View style={styles.resourcesList}>
+                {planet.resources.slice(0, 2).map((resource, idx) => (
+                  <Text key={idx} style={styles.resourceItem}>• {resource}</Text>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.tradeSection}>
+              <Text style={styles.tradeTitle}>Trade Goods:</Text>
+              <View style={styles.tradeList}>
+                {planet.tradeGoods.slice(0, 2).map((good, idx) => (
+                  <Text key={idx} style={styles.tradeItem}>• {good}</Text>
+                ))}
+              </View>
+            </View>
+
+          
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
+
+  const renderShipStatus = () => {
+    const shipAnim = useRef(new Animated.Value(0)).current;
+    const glowAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      Animated.parallel([
+        Animated.timing(shipAnim, {
+          toValue: 1,
+          duration: 1000,
+          delay: 500,
+          useNativeDriver: true,
+        }),
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(glowAnim, {
+              toValue: 1,
+              duration: 2000,
+              useNativeDriver: true,
+            }),
+            Animated.timing(glowAnim, {
+              toValue: 0,
+              duration: 2000,
+              useNativeDriver: true,
+            }),
+          ])
+        ),
+      ]).start();
+    }, []);
+
+    return (
+      <Animated.View
+        style={[
+          styles.shipStatusContainer,
+          {
+            opacity: shipAnim,
+            transform: [{
+              translateY: shipAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [50, 0],
+              }),
+            }],
+          },
+        ]}
+      >
+        <View style={styles.shipContainer}>
+          <Text style={styles.shipStatusTitle}>SHIP STATUS</Text>
+          <View style={styles.shipStatsGrid}>
+            <Animated.View
+              style={[
+                styles.shipStatItem,
+                {
+                  shadowOpacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.3, 0.8],
+                  }),
+                },
+              ]}
+            >
+              <Text style={styles.shipStatLabel}>Credits</Text>
+              <Text style={styles.shipStatValue}>125,000</Text>
+            </Animated.View>
+            <Animated.View
+              style={[
+                styles.shipStatItem,
+                {
+                  shadowOpacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.3, 0.8],
+                  }),
+                },
+              ]}
+            >
+              <Text style={styles.shipStatLabel}>Cargo</Text>
+              <Text style={styles.shipStatValue}>85%</Text>
+            </Animated.View>
+            <Animated.View
+              style={[
+                styles.shipStatItem,
+                {
+                  shadowOpacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.3, 0.8],
+                  }),
+                },
+              ]}
+            >
+              <Text style={styles.shipStatLabel}>Fuel</Text>
+              <Text style={styles.shipStatValue}>92%</Text>
+            </Animated.View>
+            <Animated.View
+              style={[
+                styles.shipStatItem,
+                {
+                  shadowOpacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.3, 0.8],
+                  }),
+                },
+              ]}
+            >
+              <Text style={styles.shipStatLabel}>Reputation</Text>
+              <Text style={styles.shipStatValue}>A+</Text>
+            </Animated.View>
+          </View>
+        </View>
+      </Animated.View>
+    );
   };
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
-      <ScrollView style={styles.container}>
-        <Text style={styles.title}>LAUNCHPAD LOG</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.backgroundContainer}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Animated Header */}
+          <Animated.View
+            style={[
+              styles.header,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  translateY: slideAnim,
+                }],
+              },
+            ]}
+          >
+            <Animated.Text
+              style={[
+                styles.title,
+                {
+                  transform: [{ scale: pulseAnim }],
+                },
+              ]}
+            >
+              STELLAR MERCHANT
+            </Animated.Text>
+            <Text style={styles.subtitle}>Navigate the cosmos, trade the stars</Text>
+          </Animated.View>
 
-        {Object.keys(groupedRockets).map((blockName) => (
-          <View key={blockName} style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>{blockName}</Text>
-            <View style={styles.cardListContainer}>
-              {groupedRockets[blockName].map((rocket) => (
-                <RocketCard
-                  key={rocket.id}
-                  item={rocket}
-                  navigation={navigation}
-                  accentColor={blockColors[blockName as keyof typeof blockColors]}
-                />
+          {/* Ship Status */}
+          {renderShipStatus()}
+
+          {/* Block Filter
+          <Animated.View
+            style={[
+              styles.filterContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  translateY: slideAnim,
+                }],
+              },
+            ]}
+          >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {['All', 'Core Systems', 'Outer Rim', 'Frontier Worlds', 'Unknown Regions'].map((block) => (
+                <TouchableOpacity
+                  key={block}
+                  style={[
+                    styles.filterButton,
+                    selectedBlock === block && styles.activeFilterButton,
+                  ]}
+                  onPress={() => setSelectedBlock(block)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[
+                    styles.filterButtonText,
+                    selectedBlock === block && styles.activeFilterButtonText,
+                  ]}>
+                    {block}
+                  </Text>
+                </TouchableOpacity>
               ))}
+            </ScrollView>
+          </Animated.View> */}
+
+          {/* Planets Grid */}
+          <Animated.View
+            style={[
+              styles.planetsContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  scale: scaleAnim,
+                }],
+              },
+            ]}
+          >
+            <Text style={styles.planetsTitle}>AVAILABLE PLANETS</Text>
+            <View style={styles.planetsGrid}>
+              {getGroupedPlanets().map((planet, index) => renderPlanetCard(planet, index))}
             </View>
-          </View>
-        ))}
-      </ScrollView>
+          </Animated.View>
+                 </ScrollView>
+       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeAreaContainer: {
-    flex: 1,
-    backgroundColor: '#0A0E1A', // Dark navy background
-  },
   container: {
-    paddingTop: 20,
-    paddingHorizontal: 20,
+    flex: 1,
+  },
+  backgroundContainer: {
+    flex: 1,
+    backgroundColor: '#0A0E1A',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    padding: 30,
+    alignItems: 'center',
+    backgroundColor: 'rgba(30, 36, 51, 0.9)',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(255, 215, 0, 0.3)',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#FFD700',
     textAlign: 'center',
-    marginBottom: 30,
-    letterSpacing: 1.5,
-  },
-  sectionContainer: {
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#D3D3D3', // Light gray title
     marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#2C3A5A',
-    paddingBottom: 5,
+    letterSpacing: 3,
+    textShadowColor: 'rgba(255, 215, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
   },
-  cardListContainer: {
+  subtitle: {
+    fontSize: 18,
+    color: '#B0C4DE',
+    textAlign: 'center',
+    letterSpacing: 1,
+    fontStyle: 'italic',
+  },
+  shipStatusContainer: {
+    margin: 20,
+  },
+  shipContainer: {
+    borderRadius: 20,
+    padding: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.4)',
+    backgroundColor: '#1E2433',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
+  },
+  shipStatusTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 2,
+  },
+  shipStatsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingBottom: 10,
   },
-  rocketCard: {
-    width: '48%', // Approx. two cards per row
-    backgroundColor: '#1E2433', // Darker blue for cards
-    borderRadius: 12,
-    padding: 12,
+  shipStatItem: {
+    width: '48%',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 15,
+    alignItems: 'center',
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  shipStatLabel: {
+    fontSize: 14,
+    color: '#B0C4DE',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  shipStatValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  filterContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 25,
+  },
+  filterButton: {
+    backgroundColor: 'rgba(30, 36, 51, 0.8)',
+    paddingHorizontal: 25,
+    paddingVertical: 15,
+    borderRadius: 30,
+    marginRight: 15,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
     elevation: 8,
   },
-  rocketImage: {
-    width: '100%',
-    height: 140,
-    resizeMode: 'cover',
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+  activeFilterButton: {
+    backgroundColor: '#FFD700',
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOpacity: 0.5,
   },
-  cardInfo: {
+  filterButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#B0C4DE',
+    letterSpacing: 1,
+  },
+  activeFilterButtonText: {
+    color: '#000000',
+  },
+  planetsContainer: {
+    padding: 20,
+  },
+  planetsTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 25,
+    textAlign: 'center',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(255, 215, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+  },
+  planetsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  planetCard: {
+    width: '48%',
+    marginBottom: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
+    elevation: 15,
+  },
+  planetTouchable: {
+    flex: 1,
+  },
+  planetContainer: {
+    padding: 20,
+    minHeight: 280,
+  },
+  planetHeader: {
+    marginBottom: 15,
+  },
+  planetName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 10,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  planetMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  rocketName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  rocketType: {
+  planetType: {
     fontSize: 14,
-    color: '#A9A9A9',
-    marginTop: 4,
-    textAlign: 'center',
+    fontWeight: '600',
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  statusIndicator: {
-    fontSize: 12,
+  planetStatus: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  planetInfo: {
+    marginBottom: 15,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  infoValue: {
+    fontSize: 14,
     fontWeight: 'bold',
-    marginTop: 8,
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
   },
-  rocketCountry: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 5,
-    fontStyle: 'italic',
+  resourcesSection: {
+    marginBottom: 15,
+  },
+  resourcesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  resourcesList: {
+    marginLeft: 10,
+  },
+  resourceItem: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 4,
+  },
+  tradeSection: {
+    marginBottom: 20,
+  },
+  tradeTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  tradeList: {
+    marginLeft: 10,
+  },
+  tradeItem: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 4,
+  },
+  exploreButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  exploreButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 1,
   },
 });

@@ -1,28 +1,21 @@
 import React from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
 import {Image, Text, View, StyleSheet, Dimensions, Platform, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient'; // <-- Изменено на react-native-linear-gradient
 
 // Import your screens (ensure these paths are correct and components are TSX)
 import HomeScreen from '../screens/HomeScreen';
-import FlightHistoryScreen from '../screens/FlightHistoryScreen';
-import SpaceMissionCollection from '../screens/SpaceMissionCollectionScreen';
+import TradeHistoryScreen from '../screens/FlightHistoryScreen';
+import CargoManagementScreen from '../screens/SpaceMissionCollectionScreen';
+import ShipUpgradeScreen from '../screens/ShipManagementScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import SpaceRoadmapScreen from '../screens/GameResultScreen.tsx';
-// RocketScreen is usually part of a StackNavigator, not directly in Drawer,
-// but if you want it here, uncomment and ensure it's a valid screen.
-// import RocketScreen from '../screens/RocketScreen';
-
 
 // Define your Drawer Navigator params list for TypeScript
-// IMPORTANT: Add all screens that will be part of this drawer navigator here
 export type DrawerParamList = {
   Home: undefined;
-  FlightHistoryScreen: undefined;
-  SpaceMissionCollection: undefined;
-  SpaceRoadmapScreen: undefined;
+  TradeHistoryScreen: undefined;
+  CargoManagementScreen: undefined;
+  ShipUpgradeScreen: undefined;
   SettingsScreen: undefined;
-  // RocketScreen: undefined; // Uncomment if RocketScreen is directly in drawer
 };
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -31,19 +24,14 @@ const { width } = Dimensions.get('window');
 // --- Custom Drawer Content Component ---
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   return (
-    <LinearGradient
-      colors={['#0A0A0A', '#1C0D2F']} // Darker top, transitioning to a deep purple/blue
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.drawerBackgroundGradient}
-    >
+    <View style={styles.drawerBackgroundContainer}>
       <View style={styles.drawerHeader}>
         <Image
           source={require('../assets/img/ico/Page-1.png')} // A generic rocket icon for branding
           style={styles.headerIcon}
         />
-        <Text style={styles.drawerHeaderText}>COSMIC ARCHIVE</Text>
-        <Text style={styles.drawerSubHeaderText}>Mission Control Log</Text>
+        <Text style={styles.drawerHeaderText}>STELLAR MERCHANT</Text>
+        <Text style={styles.drawerSubHeaderText}>Trading Command Center</Text>
       </View>
 
       {/* Drawer Item List */}
@@ -53,10 +41,10 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
 
       {/* Optional: Add a footer or additional info */}
       <View style={styles.drawerFooter}>
-        <Text style={styles.drawerFooterText}>Version 1.0.0</Text>
-        <Text style={styles.drawerFooterText}>© 2025 Starbound Corp.</Text>
+        <Text style={styles.drawerFooterText}>Version 2.0.0</Text>
+        <Text style={styles.drawerFooterText}>© 2025 Stellar Corp.</Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -107,13 +95,13 @@ const MainDrawerNavigator: React.FC = () => {
             case 'Home':
               iconSource = require('../assets/img/ico/Vectorк23.png');
               break;
-            case 'FlightHistoryScreen':
+            case 'TradeHistoryScreen':
               iconSource = require('../assets/img/ico/Group.png');
               break;
-            case 'SpaceMissionCollection':
+            case 'CargoManagementScreen':
               iconSource = require('../assets/img/ico/Vector.png');
               break;
-            case 'SpaceRoadmapScreen':
+            case 'ShipUpgradeScreen':
               iconSource = require('../assets/img/ico/Vectorко.png');
               break;
             case 'SettingsScreen':
@@ -137,18 +125,17 @@ const MainDrawerNavigator: React.FC = () => {
 
     >
       {/* Drawer Screens */}
-      <Drawer.Screen name="Home" component={HomeScreen} options={{ drawerLabel: ' Home Dashboard' }} />
-      <Drawer.Screen name="FlightHistoryScreen" component={FlightHistoryScreen} options={{ drawerLabel: ' Flight Log' }} />
-      <Drawer.Screen name="SpaceMissionCollection" component={SpaceMissionCollection} options={{ drawerLabel: ' Personal Archive' }} />
-      <Drawer.Screen name="SpaceRoadmapScreen" component={SpaceRoadmapScreen} options={{ drawerLabel: ' Cosmic Roadmap' }} />
-      <Drawer.Screen name="SettingsScreen" component={SettingsScreen} options={{ drawerLabel: ' Profile' }} />
-      {/* <Drawer.Screen name="RocketScreen" component={RocketScreen} options={{ drawerLabel: 'Rocket Catalog' }} /> */}
+      <Drawer.Screen name="Home" component={HomeScreen} options={{ drawerLabel: ' Trading Dashboard' }} />
+      <Drawer.Screen name="TradeHistoryScreen" component={TradeHistoryScreen} options={{ drawerLabel: ' Trade History' }} />
+      <Drawer.Screen name="CargoManagementScreen" component={CargoManagementScreen} options={{ drawerLabel: ' Cargo Hold' }} />
+      <Drawer.Screen name="ShipUpgradeScreen" component={ShipUpgradeScreen} options={{ drawerLabel: ' Ship Management' }} />
+      <Drawer.Screen name="SettingsScreen" component={SettingsScreen} options={{ drawerLabel: ' Captain Profile' }} />
     </Drawer.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
-  drawerBackgroundGradient: {
+  drawerBackgroundContainer: {
     flex: 1,
     backgroundColor: '#0A0A0A',
     paddingTop: Platform.OS === 'android' ? 25 : 50, // More top padding for Android, consider notch for iOS

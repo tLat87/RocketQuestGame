@@ -1,425 +1,723 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
   StyleSheet,
   ScrollView,
-  Platform, // Для Platform.OS
+  TouchableOpacity,
+  SafeAreaView,
+  Animated,
+  Dimensions,
+  Alert,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { launchImageLibrary, ImagePickerResponse, Asset } from 'react-native-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Для выбора даты
-import { StackNavigationProp } from '@react-navigation/stack'; // Типизация для навигации
 
-// Предполагаем, что у вас есть корневой тип для вашего стека навигаторов
-// Замените 'RootStackParamList' на имя вашего Root Stack ParamList
-type RootStackParamList = {
-  MainTab: undefined;
-  RocketDetailsScreen: { rocketId: string };
-  CreateMissionScreen: undefined;
-  GameScreen: undefined;
-  GameResultScreen: undefined;
-  HistoryInfoScreen: undefined;
-  MySpaceInfoScreen: undefined;
-  // Добавьте другие экраны, если они есть в вашем RootStackParamList
-};
 
-type CreateMissionScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'CreateMissionScreen'
->;
+const { width, height } = Dimensions.get('window');
 
-interface CreateMissionScreenProps {
-  navigation: CreateMissionScreenNavigationProp;
-}
-
-// Определим тип для данных экспедиции, который будет использоваться в Redux
-interface Expedition {
-  id: string; // Добавим ID для уникальности
+interface Planet {
+  id: string;
   name: string;
-  goal: string;
-  purpose: string;
-  rocket: string;
-  reason: string;
-  note: string;
-  imageUri: string | null;
-  launchDate: string | null; // Новое поле
-  missionStatus: string; // Новое поле
-  estimatedDuration: string; // Новое поле
-  payload: string; // Новое поле
+  type: string;
+  status: string;
+  resources: string[];
+  tradeGoods: string[];
+  distance: number;
+  population: number;
+  block: string;
 }
 
-// Обновите импорт addExpedition, если он принимает объект с новыми полями.
-// Предполагаем, что ваш 'createdExpeditionsSlice' будет обновлен для работы с этим типом.
-// Пример: export const addExpedition = createAction<Expedition>('expeditions/addExpedition');
-// Важно: если ваш `addExpedition` принимает только часть полей, убедитесь, что Redux slice корректно обрабатывает это.
-import { addExpedition } from '../redux/slices/createdExpeditionsSlice';
+interface TradeItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  category: string;
+  rarity: string;
+}
 
-const CreateMissionScreen: React.FC<CreateMissionScreenProps> = ({ navigation }) => {
-  const [name, setName] = useState<string>('');
-  const [goal, setGoal] = useState<string>('');
-  const [purpose, setPurpose] = useState<string>('');
-  const [rocket, setRocket] = useState<string>('');
-  const [reason, setReason] = useState<string>('');
-  const [note, setNote] = useState<string>('');
-  const [imageUri, setImageUri] = useState<string | null>(null);
+export default function TradeScreen({ route, navigation }: any) {
+  const { planet } = route.params;
+  const [selectedTab, setSelectedTab] = useState<'buy' | 'sell'>('buy');
+  
+  // Mock data
+  const [shipCredits] = useState(125000);
+  const [shipCargo] = useState(850);
+  const [maxCargo] = useState(1000);
+  const [shipFuel] = useState(92);
+  
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(100)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  const tabAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // Новые состояния для дополнительных полей
-  const [launchDate, setLaunchDate] = useState<Date | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
-  const [missionStatus, setMissionStatus] = useState<string>('');
-  const [showStatusOptions, setShowStatusOptions] = useState<boolean>(false);
-  const [estimatedDuration, setEstimatedDuration] = useState<string>('');
-  const [payload, setPayload] = useState<string>('');
+  useEffect(() => {
+    // Entrance animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
-  const dispatch = useDispatch();
+    // Continuous animations
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
 
-  const [showRocketOptions, setShowRocketOptions] = useState<boolean>(false);
-  const [showGoalOptions, setShowGoalOptions] = useState<boolean>(false); // Изменено с missionOptions на goalOptions
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
-  const rocketOptions: string[] = ['Falcon 9', 'Starship', 'Soyuz', 'Atlas V', 'New Glenn'];
-  const goalOptions: string[] = ['Mars Exploration', 'Lunar Landing', 'ISS Supply', 'Satellite Launch', 'Space Tourism', 'Asteroid Mining'];
-  const missionStatusOptions: string[] = ['Planned', 'Active', 'Completed', 'Failed', 'Aborted'];
-
-
-  const handleSave = () => {
-    const newExpedition: Expedition = {
-      id: Math.random().toString(36).substring(2, 9), // Простой способ сгенерировать ID
-      name,
-      goal,
-      purpose,
-      rocket,
-      reason,
-      note,
-      imageUri,
-      launchDate: launchDate ? launchDate.toISOString().split('T')[0] : null, // Форматируем дату в строку 'YYYY-MM-DD'
-      missionStatus,
-      estimatedDuration,
-      payload,
-    };
-    dispatch(addExpedition(newExpedition));
-    navigation.goBack();
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab as 'buy' | 'sell');
+    
+    // Tab change animation
+    Animated.sequence([
+      Animated.timing(tabAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(tabAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
-  const handlePickImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        quality: 0.8,
-      },
-      (response: ImagePickerResponse) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-          return;
-        }
-        if (response.errorCode) {
-          console.warn('ImagePicker Error: ', response.errorMessage);
-          return;
-        }
-        if (response.assets && response.assets.length > 0 && response.assets[0].uri) {
-          setImageUri(response.assets[0].uri);
-        }
-      }
-    );
+  const mockAvailableItems: TradeItem[] = [
+    { id: '1', name: 'Quantum Processors', price: 2500, quantity: 100, category: 'Technology', rarity: 'Exotic' },
+    { id: '2', name: 'Plasma Crystals', price: 1800, quantity: 75, category: 'Energy', rarity: 'Rare' },
+    { id: '3', name: 'Neural Networks', price: 3200, quantity: 50, category: 'Technology', rarity: 'Exotic' },
+    { id: '4', name: 'Exotic Alloys', price: 1200, quantity: 200, category: 'Materials', rarity: 'Uncommon' },
+    { id: '5', name: 'Energy Cores', price: 950, quantity: 150, category: 'Energy', rarity: 'Common' },
+  ];
+
+  const mockShipCargo: TradeItem[] = [
+    { id: '6', name: 'Raw Materials', price: 500, quantity: 300, category: 'Materials', rarity: 'Common' },
+    { id: '7', name: 'Circuit Components', price: 800, quantity: 120, category: 'Technology', rarity: 'Uncommon' },
+    { id: '8', name: 'Data Crystals', price: 1500, quantity: 80, category: 'Technology', rarity: 'Rare' },
+  ];
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'Common': return '#B0C4DE';
+      case 'Uncommon': return '#32CD32';
+      case 'Rare': return '#FFD700';
+      case 'Exotic': return '#FF69B4';
+      default: return '#FFFFFF';
+    }
   };
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || launchDate;
-    setShowDatePicker(Platform.OS === 'ios'); // Скрыть после выбора на iOS
-    setLaunchDate(currentDate);
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Technology': return '#8A2BE2';
+      case 'Energy': return '#FF7F50';
+      case 'Materials': return '#87CEEB';
+      default: return '#B0C4DE';
+    }
   };
+
+  const renderShipStatus = () => (
+    <Animated.View
+      style={[
+        styles.shipStatusContainer,
+        {
+          opacity: fadeAnim,
+          transform: [{
+            translateY: slideAnim,
+          }],
+        },
+      ]}
+    >
+              <View style={styles.shipStatusContainer}>
+        <Text style={styles.shipStatusTitle}>SHIP STATUS</Text>
+        <View style={styles.shipStatsGrid}>
+          <Animated.View
+            style={[
+              styles.shipStatItem,
+              {
+                shadowOpacity: glowAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.3, 0.8],
+                }),
+              },
+            ]}
+          >
+            <Text style={styles.shipStatLabel}>Credits</Text>
+            <Text style={styles.shipStatValue}>{shipCredits.toLocaleString()}</Text>
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.shipStatItem,
+              {
+                shadowOpacity: glowAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.3, 0.8],
+                }),
+              },
+            ]}
+          >
+            <Text style={styles.shipStatLabel}>Cargo</Text>
+            <Text style={styles.shipStatValue}>{shipCargo}/{maxCargo}</Text>
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.shipStatItem,
+              {
+                shadowOpacity: glowAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.3, 0.8],
+                }),
+              },
+            ]}
+          >
+            <Text style={styles.shipStatLabel}>Fuel</Text>
+            <Text style={styles.shipStatValue}>{shipFuel}%</Text>
+          </Animated.View>
+                  </View>
+        </View>
+    </Animated.View>
+  );
+
+  const renderTradeTab = () => (
+    <Animated.View
+      style={[
+        styles.tradeTabContent,
+        {
+          opacity: tabAnim,
+          transform: [{
+            scale: tabAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.95, 1],
+            }),
+          }],
+        },
+      ]}
+    >
+      <View style={styles.tradeSection}>
+        <Text style={styles.sectionTitle}>
+          {selectedTab === 'buy' ? 'AVAILABLE GOODS' : 'SHIP CARGO'}
+        </Text>
+        
+        <View style={styles.itemsGrid}>
+          {(selectedTab === 'buy' ? mockAvailableItems : mockShipCargo).map((item, index) => (
+            <Animated.View
+              key={item.id}
+              style={[
+                styles.itemCard,
+                {
+                  transform: [{
+                    translateY: tabAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [30, 0],
+                    }),
+                  }],
+                },
+              ]}
+            >
+                             <View style={styles.itemContainer}>
+                <View style={styles.itemHeader}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <View style={styles.itemMeta}>
+                    <Text style={[styles.itemCategory, { color: getCategoryColor(item.category) }]}>
+                      {item.category}
+                    </Text>
+                    <Text style={[styles.itemRarity, { color: getRarityColor(item.rarity) }]}>
+                      {item.rarity}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.itemDetails}>
+                  <Text style={styles.itemPrice}>{item.price.toLocaleString()} Credits</Text>
+                  <Text style={styles.itemQuantity}>Stock: {item.quantity}</Text>
+                </View>
+                
+        <TouchableOpacity
+                  style={styles.tradeActionButton}
+          onPress={() => {
+                    Alert.alert(
+                      selectedTab === 'buy' ? 'Buy Item' : 'Sell Item',
+                      `${selectedTab === 'buy' ? 'Buy' : 'Sell'} ${item.name} for ${item.price.toLocaleString()} credits?`
+                    );
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.tradeActionText}>
+                    {selectedTab === 'buy' ? 'BUY' : 'SELL'}
+                  </Text>
+        </TouchableOpacity>
+              </View>
+            </Animated.View>
+          ))}
+        </View>
+      </View>
+    </Animated.View>
+  );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Create New Mission</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.backgroundContainer}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Animated Header */}
+          <Animated.View
+            style={[
+              styles.header,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  translateY: slideAnim,
+                }],
+              },
+            ]}
+          >
+            <Animated.View
+              style={[
+                styles.planetIcon,
+                {
+                  transform: [{
+                    scale: pulseAnim,
+                  }],
+                },
+              ]}
+            >
+              <Text style={styles.planetIconText}>🌍</Text>
+            </Animated.View>
+            
+            <Animated.Text
+              style={[
+                styles.title,
+                {
+                  transform: [{
+                    scale: scaleAnim,
+                  }],
+                },
+              ]}
+            >
+              TRADE INTERFACE
+            </Animated.Text>
+            
+            <Text style={styles.subtitle}>Trading with {planet.name}</Text>
+          </Animated.View>
 
-      <TouchableOpacity style={styles.imageBox} onPress={handlePickImage}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.previewImage} />
-        ) : (
-          <Text style={styles.imageText}>Add Mission Image</Text>
-        )}
-      </TouchableOpacity>
+          {/* Ship Status */}
+          {renderShipStatus()}
 
-      <Text style={styles.labelRed}>Mission Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Orion Belt Research"
-        placeholderTextColor="#999"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <Text style={styles.label}>Purpose of Mission</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Study cosmic dust composition"
-        placeholderTextColor="#999"
-        value={purpose}
-        onChangeText={setPurpose}
-      />
-
-      <Text style={styles.label}>Reason for Mission</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Expand human knowledge"
-        placeholderTextColor="#999"
-        value={reason}
-        onChangeText={setReason}
-      />
-
-      {/* New: Launch Date */}
-      <Text style={styles.label}>Launch Date</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.selector}>
-        <Text style={styles.selectorText}>
-          {launchDate ? launchDate.toLocaleDateString() : 'Select Launch Date'}
-        </Text>
-        <Text style={styles.selectorArrow}>📅</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={launchDate || new Date()}
-          mode="date"
-          display="default"
-          onChange={onDateChange}
-          textColor="white" // Работает на iOS
-        />
-      )}
-
-      {/* New: Estimated Duration */}
-      <Text style={styles.label}>Estimated Duration</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., 30 days, 1 year"
-        placeholderTextColor="#999"
-        value={estimatedDuration}
-        onChangeText={setEstimatedDuration}
-        keyboardType="default"
-      />
-
-      {/* New: Payload */}
-      <Text style={styles.label}>Payload</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Scientific instruments, Rover"
-        placeholderTextColor="#999"
-        value={payload}
-        onChangeText={setPayload}
-      />
-
-      {/* Rocket Selector */}
-      <Text style={styles.label}>Select Rocket</Text>
-      <TouchableOpacity style={styles.selector} onPress={() => setShowRocketOptions(!showRocketOptions)}>
-        <Text style={styles.selectorText}>{rocket || 'Choose Rocket Type'}</Text>
-        <Text style={styles.selectorArrow}>🚀</Text>
-      </TouchableOpacity>
-      {showRocketOptions && rocketOptions.map((item) => (
+          {/* Tab Navigation */}
+          <Animated.View
+            style={[
+              styles.tabContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  translateY: slideAnim,
+                }],
+              },
+            ]}
+          >
+            {['buy', 'sell'].map((tab) => (
         <TouchableOpacity
-          key={item}
-          style={styles.optionButton}
-          onPress={() => {
-            setRocket(item);
-            setShowRocketOptions(false);
-          }}
-        >
-          <Text style={styles.optionText}>{item}</Text>
+                key={tab}
+                style={[
+                  styles.tab,
+                  selectedTab === tab && styles.activeTab,
+                ]}
+                onPress={() => handleTabChange(tab)}
+                activeOpacity={0.8}
+              >
+                <Text style={[
+                  styles.tabText,
+                  selectedTab === tab && styles.activeTabText,
+                ]}>
+                  {tab.toUpperCase()}
+                </Text>
         </TouchableOpacity>
       ))}
+          </Animated.View>
 
-      {/* Goal/Mission Type Selector */}
-      <Text style={styles.label}>Mission Type</Text>
-      <TouchableOpacity style={styles.selector} onPress={() => setShowGoalOptions(!showGoalOptions)}>
-        <Text style={styles.selectorText}>{goal || 'Choose Mission Goal'}</Text>
-        <Text style={styles.selectorArrow}>🛰️</Text>
-      </TouchableOpacity>
-      {showGoalOptions && goalOptions.map((item) => (
+          {/* Trade Content */}
+          {renderTradeTab()}
+
+          {/* Trade Summary */}
+          <Animated.View
+            style={[
+              styles.tradeSummaryContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{
+                  translateY: slideAnim,
+                }],
+              },
+            ]}
+          >
+                         <View style={styles.tradeSummaryContainer}>
+              <Text style={styles.tradeSummaryTitle}>TRADE SUMMARY</Text>
+              <View style={styles.tradeSummaryGrid}>
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>Total Value</Text>
+                  <Text style={styles.summaryValue}>0 Credits</Text>
+                </View>
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>Cargo Change</Text>
+                  <Text style={styles.summaryValue}>0 Tons</Text>
+                </View>
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>Net Profit</Text>
+                  <Text style={styles.summaryValue}>0 Credits</Text>
+                </View>
+              </View>
+              
         <TouchableOpacity
-          key={item}
-          style={styles.optionButton}
+                style={styles.executeTradeButton}
           onPress={() => {
-            setGoal(item);
-            setShowGoalOptions(false);
+                  Alert.alert('Execute Trade', 'Trade executed successfully!');
           }}
+                activeOpacity={0.8}
         >
-          <Text style={styles.optionText}>{item}</Text>
+                                 <View style={styles.executeTradeButton}>
+                   <Text style={styles.executeTradeText}>EXECUTE TRADE</Text>
+                 </View>
         </TouchableOpacity>
-      ))}
-
-      {/* New: Mission Status Selector */}
-      <Text style={styles.label}>Mission Status</Text>
-      <TouchableOpacity style={styles.selector} onPress={() => setShowStatusOptions(!showStatusOptions)}>
-        <Text style={styles.selectorText}>{missionStatus || 'Select Current Status'}</Text>
-        <Text style={styles.selectorArrow}>✅</Text>
-      </TouchableOpacity>
-      {showStatusOptions && missionStatusOptions.map((item) => (
-        <TouchableOpacity
-          key={item}
-          style={styles.optionButton}
-          onPress={() => {
-            setMissionStatus(item);
-            setShowStatusOptions(false);
-          }}
-        >
-          <Text style={styles.optionText}>{item}</Text>
-        </TouchableOpacity>
-      ))}
-
-      <Text style={styles.noteLabel}>Additional Notes</Text>
-      <TextInput
-        style={styles.noteInput}
-        placeholder="Add any additional details or notes here..."
-        placeholderTextColor="#ccc"
-        multiline
-        value={note}
-        onChangeText={setNote}
-      />
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveText}>Save Mission</Text>
-      </TouchableOpacity>
+             </View>
+          </Animated.View>
     </ScrollView>
+       </View>
+    </SafeAreaView>
   );
-};
-
-export default CreateMissionScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingVertical: 40, // Reduced top padding to make more space for content
-    backgroundColor: '#000',
-    flexGrow: 1,
+    flex: 1,
   },
-  previewImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8, // Slightly rounded corners for images
-    resizeMode: 'cover',
+  backgroundContainer: {
+    flex: 1,
+    backgroundColor: '#0A0E1A',
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
-    color: '#FFD700', // Gold color for header
-    fontSize: 26, // Larger header
-    fontWeight: 'bold',
-    marginBottom: 25,
-    alignSelf: 'center',
-    textShadowColor: 'rgba(255, 215, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  optionButton: {
-    backgroundColor: '#2A2A2A', // Darker background for options
-    padding: 14, // Slightly more padding
-    borderRadius: 8, // Rounded corners
-    marginTop: 6,
-    borderWidth: 1,
-    borderColor: '#444',
-  },
-  optionText: {
-    color: '#E0E0E0', // Lighter text for options
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: '#1E1E1E', // Very dark background for inputs
-    color: '#E0E0E0', // Light text color
-    borderRadius: 8, // Rounded corners
-    padding: 14,
-    marginBottom: 15, // More space between inputs
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#444', // Subtle border
-  },
-  imageBox: {
-    height: 180, // Slightly reduced height
-    backgroundColor: '#333',
-    borderRadius: 8,
-    justifyContent: 'center',
+    padding: 30,
     alignItems: 'center',
-    marginBottom: 25,
-    overflow: 'hidden', // Ensure image respects border radius
-    borderWidth: 2,
-    borderColor: '#FFD700', // Gold border for image box
+    backgroundColor: 'rgba(30, 36, 51, 0.95)',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(255, 215, 0, 0.4)',
   },
-  imageText: {
-    color: '#FFD700', // Gold text for "Add Picture"
+  planetIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: 'rgba(255, 215, 0, 0.6)',
+  },
+  planetIconText: {
+    fontSize: 40,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFD700',
+    textAlign: 'center',
+    marginBottom: 15,
+    letterSpacing: 2,
+    textShadowColor: 'rgba(255, 215, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#B0C4DE',
+    textAlign: 'center',
+    letterSpacing: 1,
+    fontStyle: 'italic',
+  },
+  shipStatusContainer: {
+    margin: 20,
+    borderRadius: 20,
+    padding: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.4)',
+    backgroundColor: 'rgba(30, 36, 51, 0.9)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
+  },
+  shipStatusTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 2,
+  },
+  shipStatsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  shipStatItem: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 15,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  shipStatLabel: {
+    fontSize: 14,
+    color: '#B0C4DE',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  shipStatValue: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFFFFF',
   },
-  labelRed: {
-    color: '#FF6347', // Tomato red for primary label
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(30, 36, 51, 0.9)',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(255, 215, 0, 0.3)',
+    marginHorizontal: 20,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  activeTab: {
+    borderBottomColor: '#FFD700',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#B0C4DE',
+    letterSpacing: 1,
+  },
+  activeTabText: {
+    color: '#FFD700',
+  },
+  tradeTabContent: {
+    padding: 20,
+  },
+  tradeSection: {
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
-    fontSize: 15,
-    marginBottom: 8,
-    textTransform: 'uppercase', // Uppercase for labels
-    letterSpacing: 0.5,
+    color: '#FFD700',
+    marginBottom: 25,
+    textAlign: 'center',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(255, 215, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
-  label: {
-    color: '#B0C4DE', // Lighter grey/blue for general labels
-    fontSize: 15,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  itemsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  selector: {
-    backgroundColor: '#FFD93D', // Original yellow for selector
-    padding: 16,
-    borderRadius: 8, // Rounded corners
+  itemCard: {
+    width: '48%',
+    marginBottom: 20,
+    borderRadius: 15,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  itemContainer: {
+    padding: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  },
+  itemHeader: {
+    marginBottom: 15,
+  },
+  itemName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 10,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  itemMeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8, // Reduced margin top
-    marginBottom: 15, // Add margin bottom for selector
-    borderWidth: 1,
-    borderColor: '#FFD700', // Gold border for selector
   },
-  selectorText: {
-    color: '#1A1A1A', // Darker text for better contrast on yellow
-    fontWeight: '700', // Bolder
-    fontSize: 16,
-  },
-  selectorArrow: {
-    fontSize: 20,
-    color: '#1A1A1A', // Darker arrow
-  },
-  noteLabel: {
-    color: '#B0C4DE',
-    fontSize: 15,
-    marginTop: 20,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  noteInput: {
-    backgroundColor: '#36454F', // Charcoal grey for notes
-    color: '#E0E0E0',
+  itemCategory: {
+    fontSize: 12,
+    fontWeight: '600',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 8,
-    padding: 16,
-    minHeight: 100, // Taller note input
-    textAlignVertical: 'top', // For multiline text input on Android
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#444',
   },
-  saveButton: {
-    backgroundColor: '#FF4500', // Orange-red for save button
-    padding: 18, // More padding
-    borderRadius: 8, // Rounded corners
-    marginTop: 35, // More margin top
+  itemRarity: {
+    fontSize: 12,
+    fontWeight: '600',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  itemDetails: {
+    marginBottom: 15,
     alignItems: 'center',
-    shadowColor: '#FF4500', // Reddish shadow
+  },
+  itemPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 5,
+  },
+  itemQuantity: {
+    fontSize: 14,
+    color: '#B0C4DE',
+  },
+  tradeActionButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  tradeActionText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+  tradeSummaryContainer: {
+    margin: 20,
+    borderRadius: 20,
+    padding: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  },
+  tradeSummaryTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 2,
+  },
+  tradeSummaryGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 25,
+  },
+  summaryItem: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 15,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#B0C4DE',
+    marginBottom: 5,
+    fontWeight: '600',
+  },
+  summaryValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  executeTradeButton: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 10,
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    backgroundColor: '#FFD700',
   },
-  saveText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+  executeTradeText: {
     fontSize: 18,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontWeight: 'bold',
+    color: '#000000',
+    letterSpacing: 2,
   },
 });
